@@ -156,7 +156,7 @@ def player_items(p, item_by_id):
         m = item_by_id.get(ev["item_id"])
         if not m or m["type"] != "upgrade":
             continue
-        out.append({"t": ev["game_time_s"], "name": m["name"], "slot": m["slot"],
+        out.append({"t": ev["game_time_s"], "id": ev["item_id"], "name": m["name"], "slot": m["slot"],
                     "tier": m["tier"], "image": m.get("image"), "sold_t": ev.get("sold_time_s") or 0,
                     "imbued": bool(ev.get("imbued_ability_id")), "phase": phase_of(ev["game_time_s"])})
     return out
@@ -279,7 +279,7 @@ def build_digest(match, item_by_id, hero_by_id, me_acc, refresh_names=False):
             "split": {"weapon": split["weapon"], "spirit": split["spirit"], "vitality": split["vitality"]},
             "final_build": [f'T{x["tier"]} {x["slot"]} {x["name"]}' + (" (imbued)" if x["imbued"] else "")
                             for x in final_build],
-            "final_build_items": [{"name": x["name"], "slot": x["slot"], "tier": x["tier"],
+            "final_build_items": [{"id": x["id"], "name": x["name"], "slot": x["slot"], "tier": x["tier"],
                                    "image": x.get("image"), "imbued": x["imbued"]} for x in final_build],
             "kills_on_me": kills_on_me.get(p["player_slot"], 0),
         }
@@ -334,8 +334,8 @@ def build_digest(match, item_by_id, hero_by_id, me_acc, refresh_names=False):
         "players": [player_block(p, p["account_id"] in deep_accts) for p in players],
         # name -> {slot, image, tier} for every upgrade item, so the dashboard can resolve
         # real icons + category colours for any item named in the analysis (suggestions, etc.).
-        "item_index": {m["name"]: {"slot": m["slot"], "image": m.get("image"), "tier": m["tier"]}
-                       for m in item_by_id.values()
+        "item_index": {m["name"]: {"id": iid, "slot": m["slot"], "image": m.get("image"), "tier": m["tier"]}
+                       for iid, m in item_by_id.items()
                        if m.get("type") == "upgrade" and m.get("name")},
     }
     # team soul lead over time (my_team minus enemy)

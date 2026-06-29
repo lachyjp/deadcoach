@@ -63,5 +63,7 @@ Create a Basic Task that runs `python.exe C:\path\to\watch.py --account 79761855
 ## Where reports go
 
 Each match gets `OUT_ROOT/<match_id>/<match_id>_report.html` plus its digest and analysis JSON. Open
-the HTML in any browser. The processed-match list lives in `OUT_ROOT/.seen_<account>.json`; delete it
-to reprocess from scratch.
+the HTML in any browser — but serve it over `http://` (e.g. `python3 -m http.server 8000 --directory
+OUT_ROOT/<match_id>`) so the Deadlock UI item cards load; over `file://` the charts and text still
+render but the cards do not. The processed-match list lives in `OUT_ROOT/.seen_<account>.json`; delete
+it to reprocess from scratch.

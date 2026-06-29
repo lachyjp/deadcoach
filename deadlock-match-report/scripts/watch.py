@@ -20,6 +20,19 @@ Flags:
              authenticated, and the deadlock-match-report skill installed, for the default mode.
 """
 import argparse, json, os, subprocess, sys, time, webbrowser
+import functools, threading
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+
+# lazily-started local HTTP server so the Deadlock UI item cards load (they are ESM
+# modules + cross-origin asset fetches, which browsers block on file://).
+_httpd = None
+def ensure_server(root):
+    global _httpd
+    if _httpd is None:
+        handler = functools.partial(SimpleHTTPRequestHandler, directory=str(root))
+        _httpd = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        threading.Thread(target=_httpd.serve_forever, daemon=True).start()
+    return _httpd.server_address[1]
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import dl_lib as L
@@ -80,7 +93,8 @@ def process(mid, acc, out_root, args, skill_dir):
           else run_with_claude(args.claude, skill_dir, mid, acc, out_dir))
     report = out_dir / f"{mid}_report.html"
     if ok and args.open and report.exists():
-        webbrowser.open(report.resolve().as_uri())
+        port = ensure_server(out_root)
+        webbrowser.open(f"http://127.0.0.1:{port}/{mid}/{mid}_report.html")
     return ok
 
 def main():
@@ -121,6 +135,13 @@ def main():
 
     if args.once:
         tick()
+        if args.open and _httpd is not None:
+            port = _httpd.server_address[1]
+            print(f"serving reports at http://127.0.0.1:{port}/ — Ctrl-C to stop.")
+            try:
+                threading.Event().wait()
+            except KeyboardInterrupt:
+                print("\nstopped.")
     else:
         print(f"watching account {args.account} every {args.interval}s. Ctrl-C to stop.")
         while True:

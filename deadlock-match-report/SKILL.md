@@ -87,15 +87,27 @@ Validate that `analysis.json` is valid JSON with exact phase/category keys befor
   teal-black, condensed deco display type (Big Shoulders Display) + clean sans body (Barlow), with
   corner-bracket framing and the game's category colour coding (Weapon amber / Vitality green /
   Spirit violet, souls cyan). It uses Google Fonts + the Plotly CDN, so it looks best online.
-- Real hero portraits and item icons are pulled from `assets.deadlock-api.com`: `dl_lib` records
-  each item's `image` URL and a `my_hero_image`/per-player `hero_image` portrait URL in the digest,
-  plus an `item_index` (name → slot/image/tier) so any item the analysis names resolves to live art
-  and its category colour. Any slot with no resolvable icon degrades to a styled placeholder, so the
-  report never breaks if the asset host is unreachable.
+- **Builds section + Deadlock UI item cards.** The report loads the official `@deadlock-api/ui-core`
+  web components (`<dl-provider>` + `<dl-item-card>`, from the unpkg CDN) and uses them everywhere an
+  item is shown: a dedicated **Builds** section (your final build + collapsible "the builds that beat
+  you" for each enemy who killed you / the focus enemies) and the per-phase item suggestions. Cards
+  pull live icons, tier badges and hover tooltips from `assets.deadlock-api.com` by item id. The
+  digest carries the ids: `final_build_items[].id` (every player) and `item_index[name].id` (any item
+  the analysis names). When an item name has no resolvable id (e.g. an `instead_of` not in the digest)
+  the chip degrades to a styled placeholder, so the report never breaks.
+- Hero portraits still come from `dl_lib`'s `my_hero_image`/per-player `hero_image` URLs.
+- **Serve over HTTP to view.** Because the UI components are ESM modules and fetch assets
+  cross-origin, they are blocked on `file://`. Serve the output directory and open it over `http://`,
+  e.g. `python3 -m http.server 8000 --directory <DIR>` then open
+  `http://localhost:8000/<MATCH_ID>_report.html`. (Charts/scoreboard/text still render from `file://`;
+  only the item cards need the server.)
+- **Dependency:** charts require `plotly` (`python3 -m pip install plotly`).
 
 ### 8. Deliver
-Open the report (`open` / `xdg-start` / browser) or give the user the file path, and summarise the
-three priorities in chat. If `present_files` is available, present the HTML.
+Serve the report over HTTP and give the user the link (the item cards need `http://`, see step 7),
+e.g. `python3 -m http.server 8000 --directory <DIR>` → `http://localhost:8000/<MATCH_ID>_report.html`.
+Opening the file directly (`open` / `xdg-open`) still works for everything except the item cards.
+Summarise the three priorities in chat. If `present_files` is available, present the HTML.
 
 ## Automatic mode (watch the account)
 

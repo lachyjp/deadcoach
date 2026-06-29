@@ -162,6 +162,16 @@ table.sb th.r{text-align:right}
 .pending{color:#978d77;font-style:italic}
 .footer{margin-top:30px;padding-top:18px;border-top:1px solid #1c2231;color:#7a7160;font-size:13px;letter-spacing:.04em;text-align:center}
 .footer b{color:#978d77}
+/* inline rich text: item icons + hero avatars embedded in prose */
+.rich{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;vertical-align:baseline}
+.rich .ava{width:18px;height:18px;border-radius:50%;object-fit:cover;object-position:center top;border:1px solid #6c552a;flex:0 0 auto}
+.rich .iico{width:18px;height:18px;object-fit:contain;border-radius:3px;background:#0b0e14;flex:0 0 auto}
+/* header / row / bar avatars */
+.hava{width:24px;height:24px;border-radius:50%;object-fit:cover;object-position:center top;border:1px solid #6c552a;vertical-align:middle;margin-right:8px}
+.sbava{width:22px;height:22px;border-radius:50%;object-fit:cover;object-position:center top;border:1px solid #2a3144;vertical-align:middle;margin-right:9px}
+.bar .nm{display:inline-flex;align-items:center;gap:7px;width:108px}
+.baravatar{width:18px;height:18px;border-radius:50%;object-fit:cover;object-position:center top;border:1px solid #2a3144;flex:0 0 auto}
+.ecard .h{display:flex;align-items:center}
 /* builds + deadlock UI item cards */
 .buildrow{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;margin-top:10px}
 .buildrow dl-item-card{display:block}
@@ -270,6 +280,71 @@ def resolve_item_meta(name, item_index):
 resolve_item_meta._cache = {}
 
 
+# ---- rich inline text: auto-embed item icons & hero avatars in prose --------
+GENERIC_ITEM_WORDS = {"health"}  # too generic to auto-link as an item
+
+def _avatar(img, cls="ava", alt=""):
+    return f'<img class="{cls}" src="{esc(img)}" alt="{esc(alt)}">' if img else ""
+
+
+def _richmaps(digest):
+    """Build (heroes, items, pattern) for inlining names in prose. Cached per digest.
+    Heroes (proper nouns) always link; items link only when distinctive (multi-word or
+    >=8 chars) to avoid catching generic words like 'health' in normal sentences."""
+    cache = _richmaps._cache
+    key = id(digest)
+    if key in cache:
+        return cache[key]
+    heroes = {p["hero"]: p.get("hero_image") for p in digest.get("players", []) if p.get("hero")}
+    items = {}
+    for name, meta in (digest.get("item_index") or {}).items():
+        if not name or not meta.get("id"):
+            continue
+        if name.lower() in GENERIC_ITEM_WORDS:
+            continue
+        if (" " in name) or len(name) >= 8:
+            items[name] = (meta["id"], meta.get("image"))
+    names = sorted(set(heroes) | set(items), key=len, reverse=True)
+    # match exact (case-sensitive) names on word-ish boundaries that allow apostrophes
+    pattern = (re.compile(r"(?<![\w'])(" + "|".join(re.escape(n) for n in names) + r")(?![\w'])")
+               if names else None)
+    out = (heroes, items, pattern)
+    cache[key] = out
+    return out
+_richmaps._cache = {}
+
+
+def hero_inline(name, img):
+    return f'<span class="rich">{_avatar(img, "ava", name)}{esc(name)}</span>'
+
+
+def item_inline(name, img):
+    ico = f'<img class="iico" src="{esc(img)}" alt="">' if img else ""
+    return f'<span class="rich" title="{esc(name)}">{ico}{esc(name)}</span>'
+
+
+def rich(text, digest):
+    """Escape prose, but replace recognised item / hero names with an inline icon + name."""
+    if not text:
+        return ""
+    heroes, items, pattern = _richmaps(digest)
+    if not pattern:
+        return esc(text)
+    out, last = [], 0
+    for m in pattern.finditer(text):
+        out.append(esc(text[last:m.start()]))
+        name = m.group(1)
+        if name in items:
+            out.append(item_inline(name, items[name][1]))
+        elif name in heroes:
+            out.append(hero_inline(name, heroes[name]))
+        else:
+            out.append(esc(name))
+        last = m.end()
+    out.append(esc(text[last:]))
+    return "".join(out)
+
+
 def item_chip(name, slot, image, sub, why=None, size=30, iid=None):
     cls = SLOT_CLASS.get((slot or "").lower(), "other")
     nm_size = "15px" if size >= 36 else ("14px" if size >= 34 else "13px")
@@ -320,12 +395,12 @@ def overview(digest, me, analysis):
 
     ov = (analysis or {}).get("overall", {})
     verdict = ov.get("verdict", "")
-    verdict_html = (f'<div class="verdict">{esc(verdict)}</div>' if verdict
+    verdict_html = (f'<div class="verdict">{rich(verdict, digest)}</div>' if verdict
                     else '<div class="verdict pending">Analysis pending.</div>')
     prios = ov.get("priorities", [])
     prio_html = ""
     if prios:
-        items = "".join(f'<li><span class="n">{i+1}</span>{esc(p)}</li>' for i, p in enumerate(prios))
+        items = "".join(f'<li><span class="n">{i+1}</span>{rich(p, digest)}</li>' for i, p in enumerate(prios))
         prio_html = (f'<div class="sec-head" style="margin:26px 0 4px">'
                      f'<h2 class="sec-title">Top priorities next game</h2>'
                      f'<span class="rule"></span><span class="dia">◆</span></div>'
@@ -392,7 +467,7 @@ def phase_chips(seg):
     ]) + "</div>"
 
 
-def buckets(data):
+def buckets(data, digest):
     rows = ""
     for key, label, cls in [("did_well", "Did well", "good"), ("hard_to_say", "Hard to say", "mid"),
                             ("cost_you", "Cost you", "bad"), ("blind_spots", "Blind spot", "blind")]:
@@ -402,13 +477,13 @@ def buckets(data):
         for it in (val if isinstance(val, list) else [val]):
             blind = " blind" if cls == "blind" else ""
             rows += (f'<div class="buck{blind}"><span class="lbl {cls}">{label}</span>'
-                     f'<span class="txt">{esc(it)}</span></div>')
+                     f'<span class="txt">{rich(it, digest)}</span></div>')
     return rows
 
 
-def category_block(name, data):
+def category_block(name, data, digest):
     return (f'<div class="cat"><div class="cat-h"><span class="dia">◆</span>{esc(name)}</div>'
-            f'<div class="cat-b">{buckets(data) or "<p class=pending>No notes.</p>"}</div></div>')
+            f'<div class="cat-b">{buckets(data, digest) or "<p class=pending>No notes.</p>"}</div></div>')
 
 
 def suggestion_chips(sgs, item_index, label="Items that would have helped here", size=30):
@@ -433,7 +508,7 @@ def phase_section(phase, digest, analysis, item_index):
     head = a.get("summary", "")
     win = seg.get("window", "")
     cats = a.get("categories", {})
-    body = "".join(category_block(cn, cats[cn]) for cn in CATS if cats.get(cn))
+    body = "".join(category_block(cn, cats[cn], digest) for cn in CATS if cats.get(cn))
     if not body:
         body = '<p class="pending">Analysis pending for this phase.</p>'
     sug = suggestion_chips(a.get("item_suggestions"), item_index)
@@ -443,15 +518,16 @@ def phase_section(phase, digest, analysis, item_index):
         <span class="phase-win">{esc(win)}</span>
         <span class="rule"></span>
       </div>
-      {f'<p class="phase-sum">{esc(head)}</p>' if head else ''}
+      {f'<p class="phase-sum">{rich(head, digest)}</p>' if head else ''}
       {phase_chips(seg)}{body}{sug}
     </section>'''
 
 
 # ---- targeting --------------------------------------------------------------
-def dmg_bars(d, kind):
+def dmg_bars(d, kind, himg=None):
     if not d:
         return '<p class="pending">No data.</p>'
+    himg = himg or {}
     items = list(d.items())[:6]
     mx = max(v for _, v in items) or 1
     grad = ("linear-gradient(90deg,#6FA84B,#3c5a2a)" if kind == "good"
@@ -459,7 +535,7 @@ def dmg_bars(d, kind):
     rows = ""
     for hero, v in items:
         w = round(100 * v / mx)
-        rows += (f'<div class="bar"><span class="nm">{esc(hero)}</span>'
+        rows += (f'<div class="bar"><span class="nm">{_avatar(himg.get(hero), "baravatar", hero)}{esc(hero)}</span>'
                  f'<span class="track"><span class="fill" style="width:{w}%;background:{grad}"></span></span>'
                  f'<span class="val">{c(v)}</span></div>')
     return rows
@@ -467,8 +543,9 @@ def dmg_bars(d, kind):
 
 def targeting_section(digest, me, analysis, item_index):
     tgt = (analysis or {}).get("targeting_overall", "")
-    tgt_html = (f'<div class="verdict">{esc(tgt)}</div>' if tgt
+    tgt_html = (f'<div class="verdict">{rich(tgt, digest)}</div>' if tgt
                 else '<div class="verdict pending">Analysis pending.</div>')
+    himg = {p["hero"]: p.get("hero_image") for p in digest["players"] if p.get("hero")}
     dealt = me.get("damage_dealt_to", {})
     taken = me.get("damage_taken_from", {})
     self_dmg = me.get("self_damage", 0)
@@ -484,8 +561,8 @@ def targeting_section(digest, me, analysis, item_index):
         ko = p.get("kills_on_me", 0)
         note = fen.get(hero, "")
         ksub = f"Killed you {ko}×" if ko else "Key threat"
-        ntxt = esc(note) if note else '<span class="pending">Analysis pending.</span>'
-        cards += (f'<div class="ecard"><div class="h">{esc(hero)}</div>'
+        ntxt = rich(note, digest) if note else '<span class="pending">Analysis pending.</span>'
+        cards += (f'<div class="ecard"><div class="h">{_avatar(p.get("hero_image"), "hava", hero)}{esc(hero)}</div>'
                   f'<div class="k">{ksub}</div><div class="t">{ntxt}</div></div>')
     cards_html = (f'<div class="subhead">The enemies who beat you</div>'
                   f'<div class="cards3">{cards}</div>') if cards else ""
@@ -507,8 +584,8 @@ def targeting_section(digest, me, analysis, item_index):
       {sec_head("Targeting & threats")}
       <div class="bracket" style="padding:20px 22px">{brackets()}{tgt_html}
         <div class="tgt-grid">
-          <div><div class="tgt-h good">You dealt damage to</div>{dmg_bars(dealt, "good")}</div>
-          <div><div class="tgt-h bad">You took damage from</div>{dmg_bars(taken, "bad")}</div>
+          <div><div class="tgt-h good">You dealt damage to</div>{dmg_bars(dealt, "good", himg)}</div>
+          <div><div class="tgt-h bad">You took damage from</div>{dmg_bars(taken, "bad", himg)}</div>
         </div>
         {self_chip}
       </div>
@@ -538,7 +615,7 @@ def scoreboard(digest):
                      f'<span class="s">S{sp["spirit"]}</span> '
                      f'<span class="v">V{sp["vitality"]}</span></span>')
             rows += (f'<tr class="{rowcls}">'
-                     f'<td class="name">{esc(p["hero"])}{tag}</td>'
+                     f'<td class="name">{_avatar(p.get("hero_image"), "sbava", p["hero"])}{esc(p["hero"])}{tag}</td>'
                      f'<td class="kda">{kk}/{dd}/{aa}</td>'
                      f'<td class="nw">{c(p["net_worth"])}</td>'
                      f'<td class="r mut">{c(p["souls_per_min"])}</td>'
@@ -582,8 +659,8 @@ def builds_section(digest):
         kk, dd, aa = p["kda"]
         ko = p.get("kills_on_me") or 0
         kotag = f'<span class="kotag">killed you {ko}×</span>' if ko else ""
-        summ = (f'{esc(p["hero"])} &nbsp;·&nbsp; {kk}/{dd}/{aa} &nbsp;·&nbsp; '
-                f'{c(p["net_worth"])} souls{kotag}')
+        summ = (f'{_avatar(p.get("hero_image"), "hava", p["hero"])}{esc(p["hero"])} &nbsp;·&nbsp; '
+                f'{kk}/{dd}/{aa} &nbsp;·&nbsp; {c(p["net_worth"])} souls{kotag}')
         enemy_html += (f'<details class="cat"><summary class="cat-h">'
                        f'<span class="dia">◆</span>{summ}</summary>'
                        f'<div class="cat-b">{build_row(p)}</div></details>')

@@ -56,8 +56,11 @@ def _axis(**extra):
     return base
 
 
-def _style(fig, margin=None, legend=True, xaxis=None, yaxis=None):
+def _style(fig, margin=None, legend=True, xaxis=None, yaxis=None, height=340):
+    # An explicit height is essential: in the 2-column grid the chart's container has no definite
+    # height when Plotly first renders, so without this the plot collapses to a sliver.
     fig.update_layout(
+        height=height, autosize=True,
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(255,255,255,0.012)",
         font=dict(family=FONT, color="#a89f8a", size=13),
         margin=margin or dict(l=56, r=18, t=12, b=44),
@@ -70,7 +73,8 @@ def _style(fig, margin=None, legend=True, xaxis=None, yaxis=None):
 
 
 def _div(fig):
-    return plot(fig, output_type="div", include_plotlyjs=False, config={"displayModeBar": False})
+    return plot(fig, output_type="div", include_plotlyjs=False,
+                config={"displayModeBar": False, "responsive": True})
 
 
 def _me(digest):

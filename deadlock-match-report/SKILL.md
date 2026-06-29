@@ -96,6 +96,11 @@ Validate that `analysis.json` is valid JSON with exact phase/category keys befor
   the analysis names). When an item name has no resolvable id (e.g. an `instead_of` not in the digest)
   the chip degrades to a styled placeholder, so the report never breaks.
 - Hero portraits still come from `dl_lib`'s `my_hero_image`/per-player `hero_image` URLs.
+- **Deaths map + timeline.** A "Deaths" section plots your death `pos` (and your `kills`) onto the
+  live minimap (from `/v1/map`, projected with the map `radius`), with a line from each killer's
+  position to where you died, plus a timeline of each death (killer, time/phase, time-to-kill,
+  respawn cost, and the approximate per-enemy damage in the window around it). All data-driven, so
+  it renders even in `--no-llm` mode.
 - **Serve over HTTP to view.** Because the UI components are ESM modules and fetch assets
   cross-origin, they are blocked on `file://`. Serve the output directory and open it over `http://`,
   e.g. `python3 -m http.server 8000 --directory <DIR>` then open

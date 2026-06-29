@@ -24,7 +24,12 @@ ITEM_STATS   = "https://api.deadlock-api.com/v1/analytics/item-win-loss-stats"
 HERO_STATS   = "https://api.deadlock-api.com/v1/analytics/hero-win-loss-stats"
 ASSET_ITEMS  = "https://assets.deadlock-api.com/v2/items?language=english"
 ASSET_HEROES = "https://assets.deadlock-api.com/v2/heroes?language=english"
+ASSET_MAP    = "https://api.deadlock-api.com/v1/assets/map"
 CACHE_DIR    = Path(os.environ.get("DL_CACHE", Path.home() / ".cache" / "deadlock"))
+# world coordinates are centred on the map origin; the play area spans +/- this radius. Used to
+# project (x, y) onto the minimap image. Falls back to these if the /v1/map API is unreachable.
+MAP_RADIUS_FALLBACK = 10752
+MAP_PLAIN_FALLBACK  = "https://assets-bucket.deadlock-api.com/assets-api-res/images/maps/minimap_plain.png"
 
 # ---- phase windows in seconds (approximate; phases also depend on game-state) -
 PHASES = [
@@ -103,6 +108,24 @@ def hero_images(refresh=False):
                 url = next((v for v in imgs.values() if isinstance(v, str) and v), None)
         out[h["id"]] = url
     return out
+
+def load_map(refresh=False):
+    """Map background image URL + world radius, for projecting (x, y) coords onto the minimap.
+    Reads the /v1/map asset (cached); falls back to known constants if the API is unreachable."""
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    f = CACHE_DIR / "map.json"
+    d = {}
+    try:
+        if refresh or not f.exists():
+            f.write_text(json.dumps(get_json(ASSET_MAP)))
+        d = json.loads(f.read_text())
+    except Exception:
+        d = {}
+    images = d.get("images") if isinstance(d.get("images"), dict) else {}
+    image = (images.get("plain") or images.get("minimap")
+             or d.get("plain") or d.get("minimap") or MAP_PLAIN_FALLBACK)
+    radius = d.get("radius") or MAP_RADIUS_FALLBACK
+    return {"image": image, "radius": radius}
 
 # ---- match loading ----------------------------------------------------------
 def load_match(match_id=None, file=None, out_dir="."):
@@ -231,6 +254,36 @@ def damage_matrix(mi, slot_to_acc, hero_by_id, acc_to_hero):
                     byphase[name][ds][ts_slot] += dmg_in_phase(arr, a, b)
     return final, byphase
 
+def damage_window(mi, my_slot, enemy_slots, slot_to_hero, t0, t1):
+    """Approximate damage dealt to my_slot by each enemy between game-times t0 and t1, using the
+    cumulative periodic damage_matrix samples (no per-event log exists, so this is a close
+    approximation of the window around a death). Returns {hero: damage} sorted desc."""
+    dm = mi.get("damage_matrix") or {}
+    sample_t = dm.get("sample_time_s") or []
+    if not sample_t:
+        return {}
+    def cum(arr, t):
+        v = 0
+        for i, ts in enumerate(sample_t):
+            if ts <= t:
+                v = arr[i] if i < len(arr) else arr[-1]
+            else:
+                break
+        return v
+    out = defaultdict(int)
+    for dealer in dm.get("damage_dealers", []):
+        ds = dealer["dealer_player_slot"]
+        if ds not in enemy_slots:
+            continue
+        for src in dealer.get("damage_sources", []):
+            for tp in src.get("damage_to_players", []):
+                if tp.get("target_player_slot") != my_slot:
+                    continue
+                arr = tp.get("damage") or []
+                if arr:
+                    out[slot_to_hero.get(ds, "?")] += max(cum(arr, t1) - cum(arr, t0), 0)
+    return dict(sorted(((h, v) for h, v in out.items() if v > 0), key=lambda kv: -kv[1]))
+
 def build_digest(match, item_by_id, hero_by_id, me_acc, refresh_names=False):
     mi = match.get("match_info", match)
     players = mi["players"]
@@ -309,13 +362,36 @@ def build_digest(match, item_by_id, hero_by_id, me_acc, refresh_names=False):
                     taken[acc_to_hero[slot_to_acc[ds]]] = targets[myslot]
             blk["damage_taken_from"] = dict(sorted(taken.items(), key=lambda kv: -kv[1]))
             if p["account_id"] == me_acc:
+                enemy_slots = {pl["player_slot"] for pl in players if pl["team"] == enemy_team_p}
+                sample_t = (mi.get("damage_matrix") or {}).get("sample_time_s") or []
+                def _win(gt):
+                    # the ~3-min sample interval bracketing the death (cumulative samples are sparse)
+                    prev = max([s for s in sample_t if s < gt], default=0)
+                    later = [s for s in sample_t if s >= gt]
+                    return damage_window(mi, myslot, enemy_slots, slot_to_hero,
+                                         prev, min(later) if later else gt)
                 blk["deaths"] = [{
                     "t": mmss(d["game_time_s"]), "phase": phase_of(d["game_time_s"]),
+                    "game_time_s": d["game_time_s"],
                     "killer": slot_to_hero.get(d.get("killer_player_slot"), "?"),
                     "focused_s": round(d.get("time_to_kill_s") or 0, 1),
                     "down_s": d.get("death_duration_s"),
                     "pos": [round(d["death_pos"][k]) for k in ("x", "y", "z")] if d.get("death_pos") else None,
+                    "killer_pos": [round(d["killer_pos"][k]) for k in ("x", "y")] if d.get("killer_pos") else None,
+                    "dmg_window": _win(d["game_time_s"]),
                 } for d in p.get("death_details", [])]
+                # my kills: any enemy death where I was the killer (position = where they died)
+                kills = []
+                for vp in players:
+                    if vp["player_slot"] == myslot:
+                        continue
+                    for d in vp.get("death_details", []):
+                        if d.get("killer_player_slot") == myslot and d.get("death_pos"):
+                            kills.append((d["game_time_s"], {
+                                "t": mmss(d["game_time_s"]), "phase": phase_of(d["game_time_s"]),
+                                "victim": slot_to_hero.get(vp["player_slot"], "?"),
+                                "pos": [round(d["death_pos"][k]) for k in ("x", "y")]}))
+                blk["kills"] = [k for _, k in sorted(kills, key=lambda x: x[0])]
                 dpp = Counter(phase_of(d["game_time_s"]) for d in p.get("death_details", []))
                 for ph in blk["phases"]:
                     blk["phases"][ph]["deaths_actual"] = dpp.get(ph, 0)
@@ -337,6 +413,8 @@ def build_digest(match, item_by_id, hero_by_id, me_acc, refresh_names=False):
         "item_index": {m["name"]: {"id": iid, "slot": m["slot"], "image": m.get("image"), "tier": m["tier"]}
                        for iid, m in item_by_id.items()
                        if m.get("type") == "upgrade" and m.get("name")},
+        # map background image + world radius for the deaths map (projects x/y onto the minimap)
+        "map": load_map(),
     }
     # team soul lead over time (my_team minus enemy)
     series = {0: defaultdict(int), 1: defaultdict(int)}

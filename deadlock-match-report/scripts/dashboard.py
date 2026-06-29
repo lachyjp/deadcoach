@@ -173,6 +173,33 @@ table.sb th.r{text-align:right}
 .bar .nm{display:inline-flex;align-items:center;gap:7px;width:108px}
 .baravatar{width:18px;height:18px;border-radius:50%;object-fit:cover;object-position:center top;border:1px solid #2a3144;flex:0 0 auto}
 .ecard .h{display:flex;align-items:center}
+/* deaths map + timeline */
+.mapwrap{position:relative;width:100%;max-width:560px;margin:6px auto 0;aspect-ratio:1/1;border:1px solid #2a3144;background:#0b0e14;overflow:hidden}
+.mapimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.92}
+.ganksvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ganksvg line{stroke:#C8413B;stroke-width:.5;stroke-dasharray:1.6 1.2;opacity:.6}
+.mlayer{position:absolute;inset:0}
+.dmark{position:absolute;transform:translate(-50%,-50%);display:grid;place-items:center;font-family:'Big Shoulders Display',sans-serif;font-weight:800;color:#0a0d13;cursor:default}
+.dmark.death{width:19px;height:19px;font-size:11px;border-radius:50%;background:#C8413B;border:1.5px solid #f0c0bc;box-shadow:0 1px 4px #000a}
+.dmark.kill{width:11px;height:11px;border-radius:50%;background:#C8A24A;border:1px solid #f4d888;box-shadow:0 1px 3px #0008}
+.maplegend{display:flex;gap:18px;justify-content:center;margin-top:12px;font-size:12.5px;color:#a89f8a;letter-spacing:.04em}
+.maplegend .lg{display:inline-flex;align-items:center;gap:6px}
+.maplegend .lg::before{content:"";width:11px;height:11px;border-radius:50%;display:inline-block}
+.maplegend .death::before{background:#C8413B}
+.maplegend .kill::before{background:#C8A24A}
+.maplegend .line::before{border-radius:0;width:15px;height:0;border-top:2px dashed #C8413B}
+.dtl{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.dtl-card{display:flex;gap:12px;background:#11151d;border:1px solid #232a3a;border-left:3px solid #C8413B;padding:11px 14px}
+.dtl-n{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:#C8413B;color:#0a0d13;font-family:'Big Shoulders Display',sans-serif;font-weight:800;display:grid;place-items:center;font-size:14px}
+.dtl-main{flex:1;min-width:0}
+.dtl-h{color:#e8e0cf;font-size:15px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.dtl-h .dtl-t{color:#978d77;font-size:12.5px;letter-spacing:.04em;margin-left:auto}
+.dtl-meta{color:#a89f8a;font-size:12.5px;margin-top:3px}
+.dtl-dmg{margin-top:7px;display:flex;gap:6px 12px;flex-wrap:wrap;align-items:center}
+.dtl-dmg .dlabel{color:#847c6a;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.dsrc{display:inline-flex;align-items:center;gap:4px;color:#cabd9f;font-size:12.5px;white-space:nowrap}
+.dsrc img{width:16px;height:16px}
+@media(max-width:760px){.mapwrap{max-width:100%}}
 /* hero playbook: situational tips, macro, resources */
 .sitgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
 .sitcard{background:#11151d;border:1px solid #232a3a;border-top:2px solid #C8A24A;padding:13px 15px}
@@ -741,9 +768,94 @@ def playbook_section(digest, analysis):
     </section>'''
 
 
+# ---- deaths map + timeline --------------------------------------------------
+# Calibration of world (x, y) -> minimap image position. The play area spans +/- radius about the
+# map origin; flip these if markers come out mirrored when checked against the map image.
+MAP_FLIP_X = False
+MAP_FLIP_Y = False  # world +y is north -> top of image (top% small)
+
+
+def coord_to_pct(x, y, radius):
+    r = radius or 10752
+    fx = -x if MAP_FLIP_X else x
+    fy = -y if MAP_FLIP_Y else y
+    left = (fx + r) / (2 * r) * 100        # -r -> 0% (left), +r -> 100% (right)
+    top = (r - fy) / (2 * r) * 100         # +r -> 0% (top), -r -> 100% (bottom)
+    return max(0, min(100, left)), max(0, min(100, top))
+
+
+def death_map(digest):
+    mp = digest.get("map") or {}
+    img = mp.get("image")
+    R = mp.get("radius") or 10752
+    if not img:
+        return ""
+    me = next(p for p in digest["players"] if p["is_me"])
+    deaths = [d for d in (me.get("deaths") or []) if d.get("pos")]
+    kills = [d for d in (me.get("kills") or []) if d.get("pos")]
+    lines, markers = "", ""
+    for i, d in enumerate(deaths, 1):
+        dl, dt = coord_to_pct(d["pos"][0], d["pos"][1], R)
+        if d.get("killer_pos"):
+            kl, kt = coord_to_pct(d["killer_pos"][0], d["killer_pos"][1], R)
+            lines += f'<line x1="{kl:.2f}" y1="{kt:.2f}" x2="{dl:.2f}" y2="{dt:.2f}"/>'
+        title = (f'#{i} · {d["t"]} ({d["phase"]}) — killed by {d["killer"]}; '
+                 f'focused {d["focused_s"]}s, {d.get("down_s")}s dead')
+        markers += (f'<div class="dmark death" style="left:{dl:.2f}%;top:{dt:.2f}%" '
+                    f'title="{esc(title)}">{i}</div>')
+    for d in kills:
+        kl, kt = coord_to_pct(d["pos"][0], d["pos"][1], R)
+        ktitle = esc("Kill · {} — {}".format(d["t"], d["victim"]))
+        markers += (f'<div class="dmark kill" style="left:{kl:.2f}%;top:{kt:.2f}%" '
+                    f'title="{ktitle}"></div>')
+    svg = f'<svg class="ganksvg" viewBox="0 0 100 100" preserveAspectRatio="none">{lines}</svg>'
+    legend = ('<div class="maplegend"><span class="lg death">your deaths</span>'
+              '<span class="lg kill">your kills</span>'
+              '<span class="lg line">killer → you</span></div>')
+    return (f'<div class="mapwrap"><img class="mapimg" src="{esc(img)}" alt="map">'
+            f'{svg}<div class="mlayer">{markers}</div></div>{legend}')
+
+
+def death_timeline(digest):
+    me = next(p for p in digest["players"] if p["is_me"])
+    deaths = me.get("deaths") or []
+    if not deaths:
+        return '<p class="pending">No deaths recorded.</p>'
+    himg = {p["hero"]: p.get("hero_image") for p in digest["players"] if p.get("hero")}
+    cards = ""
+    for i, d in enumerate(deaths, 1):
+        killer = d["killer"]
+        dw = d.get("dmg_window") or {}
+        srcs = "".join(f'<span class="dsrc">{_avatar(himg.get(h), "ava", h)}{esc(h)} {c(v)}</span>'
+                       for h, v in list(dw.items())[:4])
+        dmg = f'<div class="dtl-dmg"><span class="dlabel">damage to you</span>{srcs}</div>' if srcs else ""
+        loc = f' · pos {d["pos"][0]}, {d["pos"][1]}' if d.get("pos") else ""
+        cards += (f'<div class="dtl-card"><div class="dtl-n">{i}</div><div class="dtl-main">'
+                  f'<div class="dtl-h">{_avatar(himg.get(killer), "hava", killer)}'
+                  f'<b>{esc(killer)}</b> killed you'
+                  f'<span class="dtl-t">{esc(d["t"])} · {esc(d["phase"])}</span></div>'
+                  f'<div class="dtl-meta">focused {d["focused_s"]}s · {d.get("down_s")}s dead{loc}</div>'
+                  f'{dmg}</div></div>')
+    return f'<div class="dtl">{cards}</div>'
+
+
+def deaths_section(digest):
+    me = next(p for p in digest["players"] if p["is_me"])
+    if not (me.get("deaths") or me.get("kills")):
+        return ""
+    return f'''<section id="deaths" class="divided">
+      {sec_head("Deaths & map")}
+      <div class="bracket">{brackets()}{death_map(digest)}</div>
+      <div class="subhead">Death timeline</div>
+      {death_timeline(digest)}
+      <div class="note">Marker numbers match the timeline. The killer is exact; "damage to you" is the
+      cumulative damage-matrix window bracketing each death (~3-min samples), so it is approximate.</div>
+    </section>'''
+
+
 # ---- assembly ---------------------------------------------------------------
 def nav_links():
-    items = ["Overview", "Charts"] + PHASES + ["Builds", "Targeting", "Playbook", "Scoreboard"]
+    items = ["Overview", "Charts"] + PHASES + ["Builds", "Targeting", "Deaths", "Playbook", "Scoreboard"]
     return "".join(f'<a href="#{s.lower().replace(" ", "-")}">{esc(s)}</a>' for s in items)
 
 
@@ -788,6 +900,7 @@ def build(digest, analysis):
 {phases}
 {builds_section(digest)}
 {targeting_section(digest, me, analysis, item_index)}
+{deaths_section(digest)}
 {playbook_section(digest, analysis)}
 {scoreboard(digest)}
 <div class="footer">Generated by <b>deadlock-match-report</b> · data via deadlock-api.com · portraits, item icons &amp; cards via assets.deadlock-api.com</div>

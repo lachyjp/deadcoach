@@ -56,9 +56,18 @@ Deep players (the user + focus enemies) also have:
     fight you should have left. It is fight duration, not a pure burst metric.
   - `down_s` (death_duration) — seconds spent dead. This grows through the game, so late deaths cost
     far more uptime than early ones. Several late deaths is often the real reason a comeback failed.
-  - `pos` — world coordinates of the death. Strongly negative coordinates are roughly the enemy side
-    of the map; clusters of deaths deep on the enemy side while behind suggest overextension. The
-    map is not labelled, so treat position as a strong hint, not a certainty.
+  - `pos` — `[x, y, z]` world coordinates of the death. Plotted on the minimap in the report's
+    Deaths section. Strongly negative coordinates are roughly the enemy side of the map; clusters of
+    deaths deep on the enemy side while behind suggest overextension.
+  - `killer_pos` — `[x, y]` where the killer stood at the moment of the kill (drawn as a line to the
+    death spot — useful for spotting ganks from off-angle).
+  - `dmg_window` — `{hero: damage}` taken from each enemy in the cumulative damage-matrix sample
+    interval bracketing the death (~3-min samples). **Approximate**, not a precise last-few-seconds
+    log; the `killer` is exact, this is the surrounding context.
+- `kills` (user only) — each enemy kill you got, with `t`, `phase`, `victim`, and `pos` (where they
+  died). Plotted as gold markers on the deaths map.
+- `map` (digest top level) — `{image, radius}`: the minimap background image URL and the world
+  radius used to project `(x, y)` coordinates onto it.
 
 ## What the data cannot tell you (always keep these in mind)
 

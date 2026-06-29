@@ -53,10 +53,20 @@ Goal: win or stabilise the lane and farm. Buy sustain if you are losing trades.
 
 ## Self-damage and risk items
 
-Some aggression items cost you health or healing (e.g. health-draining sacrifice items). They are
-strong on a durable build with armour and a real health pool, and a liability on a squishy build with
-neither, because the self-damage you take is not offset. If the digest shows large self-damage on a
-build with no armour, that is a "cost you" itemisation point.
+Some aggression/sustain items cost you health (e.g. health-draining or "tribute" items). Many of
+these are **passives** whose benefit (bonus weapon/spirit power, lifesteal, regen) is baked into your
+other damage and sustain — so their HP cost is **not wasted output**, it is the price of the buff.
+
+**Read the digest's self-damage breakdown, not a raw total.** The digest now gives
+`me.self_damage` (already **excludes regen/healing**), a per-source `me.self_damage_breakdown`, and
+`me.self_heal` (your regen/sustain). Judge a self-damage item by:
+- its share of the breakdown (don't blame one item for the whole figure — e.g. Blood Tribute is often
+  a small slice), and
+- whether it actually cost you fights: deaths where you were already low, self-damage large **relative
+  to** your health pool and regen.
+Only call self-damage a "cost you" point when the breakdown + deaths show it genuinely outweighed its
+benefit on a squishy build — and say which item, with its real number. Do **not** treat self-damage as
+pure waste, and account for `self_heal` before concluding.
 
 ## How to choose a suggestion
 

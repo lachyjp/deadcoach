@@ -284,6 +284,56 @@ def damage_window(mi, my_slot, enemy_slots, slot_to_hero, t0, t1):
                     out[slot_to_hero.get(ds, "?")] += max(cum(arr, t1) - cum(arr, t0), 0)
     return dict(sorted(((h, v) for h, v in out.items() if v > 0), key=lambda kv: -kv[1]))
 
+SELF_HEAL_STAT_TYPE = 5  # in source_details.stat_type, 5 = healing/regen (NOT self-damage)
+
+def self_damage_detail(mi, my_slot, item_by_id):
+    """Break down damage the player did to THEMSELVES by source, excluding healing/regen.
+
+    The raw damage matrix logs regen and healing pickups as self-targeted "damage" too, which badly
+    inflates a naive self-damage total. We split those out (stat_type 5 = healing) so the reported
+    figure is real self-harm, and return a per-source breakdown plus the total self-healing for
+    context. Note: passive items like Blood Tribute show here as their HP cost only — their benefit
+    (bonus power/regen) is baked into the player's other damage, not a separate source."""
+    dm = mi.get("damage_matrix") or {}
+    sd = dm.get("source_details") or {}
+    names = sd.get("source_name") or []
+    stypes = sd.get("stat_type") or []
+    cls2name = {m.get("class_name"): m.get("name") for m in item_by_id.values() if m.get("class_name")}
+
+    def pretty(src):
+        if cls2name.get(src):
+            return cls2name[src]
+        s = src
+        for pfx in ("upgrade_", "citadel_ability_", "citadel_weapon_", "ability_",
+                    "modifier_citadel_", "modifier_"):
+            if s.startswith(pfx):
+                s = s[len(pfx):]
+                break
+        return s.replace("_", " ").strip().title() or src
+
+    dmg = defaultdict(int)
+    heal = 0
+    for dealer in dm.get("damage_dealers", []):
+        if dealer.get("dealer_player_slot") != my_slot:
+            continue
+        for s in dealer.get("damage_sources", []):
+            idx = s.get("source_details_index")
+            nm = names[idx] if isinstance(idx, int) and idx < len(names) else "?"
+            st = stypes[idx] if isinstance(idx, int) and idx < len(stypes) else None
+            for tp in s.get("damage_to_players", []):
+                if tp.get("target_player_slot") != my_slot:
+                    continue
+                v = (tp.get("damage") or [0])[-1]
+                if not v:
+                    continue
+                if st == SELF_HEAL_STAT_TYPE:
+                    heal += v
+                else:
+                    dmg[pretty(nm)] += v
+    total = sum(dmg.values())
+    breakdown = sorted(({"name": k, "amount": v} for k, v in dmg.items()), key=lambda x: -x["amount"])
+    return total, breakdown, heal
+
 def build_digest(match, item_by_id, hero_by_id, me_acc, refresh_names=False):
     mi = match.get("match_info", match)
     players = mi["players"]
@@ -344,15 +394,19 @@ def build_digest(match, item_by_id, hero_by_id, me_acc, refresh_names=False):
             blk["networth_series"] = [[t, v] for t, v in stat_series(p, "net_worth")]
             myslot = p["player_slot"]
             enemy_team_p = 1 - p["team"]
-            dealt = {}; self_dmg = 0
+            dealt = {}
             for ts, dmg in final_dmg[myslot].items():
                 if ts == myslot:
-                    self_dmg = dmg; continue
+                    continue
                 tp = next((pl for pl in players if pl["player_slot"] == ts), None)
                 if tp and tp["team"] == enemy_team_p:
                     dealt[acc_to_hero[slot_to_acc[ts]]] = dmg
             blk["damage_dealt_to"] = dict(sorted(dealt.items(), key=lambda kv: -kv[1]))
-            blk["self_damage"] = self_dmg
+            # self-damage, excluding healing/regen, with a per-source breakdown (see self_damage_detail)
+            sdmg, sdmg_breakdown, sheal = self_damage_detail(mi, myslot, item_by_id)
+            blk["self_damage"] = sdmg
+            blk["self_damage_breakdown"] = sdmg_breakdown
+            blk["self_heal"] = sheal
             taken = {}
             for ds, targets in final_dmg.items():
                 if ds == myslot or myslot not in targets:

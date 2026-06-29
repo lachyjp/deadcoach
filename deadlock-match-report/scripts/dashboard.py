@@ -133,9 +133,14 @@ h1.title{font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-siz
 .bar .track{flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden}
 .bar .fill{position:absolute;left:0;top:0;bottom:0}
 .bar .val{width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px}
-.selfdmg{margin-top:16px;display:inline-flex;align-items:center;gap:10px;background:#16140f;border:1px solid #3a2c16;border-left:3px solid #D9A441;padding:9px 14px}
-.selfdmg .k{font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:11px;letter-spacing:.12em;color:#D9A441;text-transform:uppercase}
-.selfdmg .v{font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#D9A441}
+.sdpanel{margin-top:16px;background:#16140f;border:1px solid #3a2c16;border-left:3px solid #D9A441;padding:11px 14px}
+.sdhead{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.sdhead .k{font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:11px;letter-spacing:.12em;color:#D9A441;text-transform:uppercase}
+.sdhead .v{font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:22px;color:#D9A441}
+.sdhead .sdsub{color:#978d77;font-size:12px;letter-spacing:.02em}.sdhead .sdsub b{color:#cabd9f}
+.sdlist{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:9px}
+.sdrow{display:inline-flex;align-items:center;gap:6px;background:#11151d;border:1px solid #2a3144;padding:4px 9px;font-size:12.5px}
+.sdrow .sn{color:#cabd9f}.sdrow .sv{font-family:'Big Shoulders Display',sans-serif;color:#D9A441;font-weight:700}
 .cards3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .ecard{background:#11151d;border:1px solid #232a3a;border-top:2px solid #C8413B;padding:13px 15px}
 .ecard .h{font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:18px;color:#e8e0cf;letter-spacing:.03em}
@@ -587,6 +592,24 @@ def dmg_bars(d, kind, himg=None):
     return rows
 
 
+def self_damage_panel(me):
+    sd = me.get("self_damage", 0)
+    heal = me.get("self_heal", 0)
+    bd = me.get("self_damage_breakdown") or []
+    if not (sd or heal or bd):
+        return ""
+    rows = "".join(f'<span class="sdrow"><span class="sn">{esc(b["name"])}</span>'
+                   f'<span class="sv">{c(b["amount"])}</span></span>' for b in bd[:6])
+    healnote = f' &nbsp;·&nbsp; self-heal / regen <b>{c(heal)}</b>' if heal else ""
+    return (f'<div class="sdpanel">'
+            f'<div class="sdhead"><span class="k">Self-damage</span> <span class="v">{c(sd)}</span> '
+            f'<span class="sdsub">excludes regen{healnote}</span></div>'
+            f'<div class="sdlist">{rows}</div>'
+            f'<div class="note">Passive items (e.g. Blood Tribute) show here as their HP cost only — '
+            f'their bonus power and regen are baked into your other damage, so this cost is not wasted output.</div>'
+            f'</div>')
+
+
 def targeting_section(digest, me, analysis, item_index):
     tgt = (analysis or {}).get("targeting_overall", "")
     tgt_html = (f'<div class="verdict">{rich(tgt, digest)}</div>' if tgt
@@ -594,9 +617,7 @@ def targeting_section(digest, me, analysis, item_index):
     himg = {p["hero"]: p.get("hero_image") for p in digest["players"] if p.get("hero")}
     dealt = me.get("damage_dealt_to", {})
     taken = me.get("damage_taken_from", {})
-    self_dmg = me.get("self_damage", 0)
-    self_chip = (f'<div class="selfdmg"><span class="k">Self-damage</span>'
-                 f'<span class="v">{c(self_dmg)}</span></div>') if self_dmg else ""
+    self_chip = self_damage_panel(me)
 
     # focus enemy cards
     by_hero = {p["hero"]: p for p in digest["players"]}
@@ -786,9 +807,25 @@ def coord_to_pct(x, y, radius):
     return max(0, min(100, left)), max(0, min(100, top))
 
 
+ASSET_MINIMAP = Path(__file__).resolve().parent.parent / "assets" / "minimap.png"
+
+
+def _map_image_src(digest):
+    """Prefer the bundled minimap (embedded as a data URI so reports are self-contained and work on
+    the live site); fall back to the deadlock-api map URL."""
+    try:
+        if ASSET_MINIMAP.exists():
+            import base64
+            b64 = base64.b64encode(ASSET_MINIMAP.read_bytes()).decode()
+            return f"data:image/png;base64,{b64}"
+    except Exception:
+        pass
+    return (digest.get("map") or {}).get("image")
+
+
 def death_map(digest):
     mp = digest.get("map") or {}
-    img = mp.get("image")
+    img = _map_image_src(digest)
     R = mp.get("radius") or 10752
     if not img:
         return ""

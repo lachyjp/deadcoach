@@ -44,8 +44,13 @@ Deep players (the user + focus enemies) also have:
 - `networth_series`, `dmg_series_dealt`, `dmg_series_taken` — time series for the charts.
 - `damage_dealt_to` — total hero damage the user dealt to each **enemy** (self-damage and teammate
   damage are excluded). The core of targeting analysis.
-- `self_damage` — damage the user dealt to themselves (e.g. health-draining items like Blood
-  Tribute). Large self-damage on a build with no armour is a real cost.
+- `self_damage` — damage the user dealt to themselves, **already excluding regen/healing**. Paired
+  with `self_damage_breakdown` (per-source list, e.g. `[{name, amount}]`) and `self_heal` (total
+  regen/sustain). Do not blame a single item for the whole figure — read the breakdown. Passive items
+  (e.g. Blood Tribute) appear as their HP cost only; their power/regen benefit is in your other
+  numbers, so the cost is not "wasted". Only a "cost you" point when the breakdown + deaths show it
+  outweighed its benefit on a squishy build (name the item and its real number, and account for
+  `self_heal`).
 - `damage_taken_from` — total damage each **enemy** dealt to the user. The enemy at the top is the
   biggest threat to itemise and position against.
 - `deaths` (user only) — each death with:

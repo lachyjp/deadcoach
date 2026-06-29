@@ -1,0 +1,115 @@
+[
+ {
+  "match_id": 91282802,
+  "hero": "Warden",
+  "hero_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/warden_card.png",
+  "won": false,
+  "kda": [
+   2,
+   9,
+   5
+  ],
+  "net_worth": 36668,
+  "souls_per_min": 956,
+  "duration": "38:22",
+  "duration_s": 2302,
+  "start_time": 1782715425,
+  "date": "2026-06-29",
+  "focus_enemies": [
+   "Venator",
+   "Lady Geist",
+   "Mirage"
+  ],
+  "url": "91282802/"
+ },
+ {
+  "match_id": 90475136,
+  "hero": "Warden",
+  "hero_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/warden_card.png",
+  "won": true,
+  "kda": [
+   10,
+   8,
+   15
+  ],
+  "net_worth": 45652,
+  "souls_per_min": 1077,
+  "duration": "42:24",
+  "duration_s": 2544,
+  "start_time": 1782300129,
+  "date": "2026-06-24",
+  "focus_enemies": [
+   "Dynamo",
+   "Celeste",
+   "Vyper",
+   "Lash"
+  ],
+  "url": "90475136/"
+ },
+ {
+  "match_id": 90298882,
+  "hero": "Warden",
+  "hero_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/warden_card.png",
+  "won": true,
+  "kda": [
+   10,
+   6,
+   14
+  ],
+  "net_worth": 43380,
+  "souls_per_min": 1148,
+  "duration": "37:47",
+  "duration_s": 2267,
+  "start_time": 1782204581,
+  "date": "2026-06-23",
+  "focus_enemies": [
+   "Infernus",
+   "Lady Geist"
+  ],
+  "url": "90298882/"
+ },
+ {
+  "match_id": 87322302,
+  "hero": "Venator",
+  "hero_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/priest_card.png",
+  "won": false,
+  "kda": [
+   4,
+   9,
+   7
+  ],
+  "net_worth": 27670,
+  "souls_per_min": 807,
+  "duration": "34:16",
+  "duration_s": 2056,
+  "start_time": 1780804580,
+  "date": "2026-06-07",
+  "focus_enemies": [
+   "Wraith",
+   "Seven"
+  ],
+  "url": "87322302/"
+ },
+ {
+  "match_id": 82976302,
+  "hero": "Warden",
+  "hero_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/warden_card.png",
+  "won": true,
+  "kda": [
+   7,
+   4,
+   17
+  ],
+  "net_worth": 44898,
+  "souls_per_min": 1179,
+  "duration": "38:04",
+  "duration_s": 2284,
+  "start_time": 1779020423,
+  "date": "2026-05-17",
+  "focus_enemies": [
+   "Apollo",
+   "Mirage"
+  ],
+  "url": "82976302/"
+ }
+]

@@ -49,6 +49,8 @@ header.site{position:sticky;top:0;z-index:20;background:rgba(10,13,19,.93);backd
 .result.loss{color:#C04A3C}.result.win{color:#6FA84B}
 .metaline{color:#a89f8a;font-size:14px;letter-spacing:.03em}
 .metaline .souls{color:#2ADFFC}.metaline .mid{color:#847c6a}
+.homelink{display:inline-block;font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#9a7b3d;margin-bottom:8px}
+.homelink:hover{color:#C8A24A}
 nav{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
 nav a{font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#a89f8a;padding:4px 11px;border:1px solid #2a3144;background:#11151d}
 nav a:hover{color:#e8e0cf;border-color:#C8A24A}
@@ -864,6 +866,7 @@ def header(digest, me):
     rcls = "win" if digest["i_won"] else "loss"
     kk, dd, aa = me["kda"]
     return f'''<header class="site"><div class="hwrap">
+      <a class="homelink" href="../">&#8592; All matches</a>
       <div class="hrow">
         <div class="heroname brass-text">{esc(me["hero"])}</div>
         <span class="result {rcls}">◆ {esc(result)}</span>
@@ -884,6 +887,8 @@ def build(digest, analysis):
     return f'''<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Deadlock match {esc(digest["match_id"])} — {esc(me["hero"])} report</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="googlebot" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;500;600;700;800;900&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">

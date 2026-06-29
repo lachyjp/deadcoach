@@ -103,6 +103,14 @@ def process(mid, acc, out_root, args, skill_dir):
     if ok and args.open and report.exists():
         port = ensure_server(out_root)
         webbrowser.open(f"http://127.0.0.1:{port}/{mid}/{mid}_report.html")
+    if ok and getattr(args, "publish", False) and report.exists():
+        try:
+            import publish as P
+            ids = P.discover_ids(out_root)
+            P.publish(ids, out_root, P.DEFAULT_DOCS, acc)
+            P.git_push(P.DEFAULT_DOCS, len(ids))
+        except Exception as e:
+            print(f"  -> publish failed: {e}")
     return ok
 
 def main():
@@ -121,6 +129,8 @@ def main():
     ap.add_argument("--ranked-only", action="store_true")
     ap.add_argument("--include-brawl", action="store_true",
                     help="also build reports for Street Brawl games (skipped by default)")
+    ap.add_argument("--publish", action="store_true",
+                    help="after building a new report, publish the whole site to docs/ and push (GitHub Pages)")
     ap.add_argument("--backfill", type=int, default=0,
                     help="on first run, process the N most recent matches (default 0: just mark them seen)")
     args = ap.parse_args()

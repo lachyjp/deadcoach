@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;500;600;700;800;900&amp;family=Cinzel:wght@500;600;700;800&amp;family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Barlow+Semi+Condensed:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+@keyframes dirgrain{0%{transform:translate(0,0)}100%{transform:translate(-8px,6px)}}
+</style>
+</helmet>
+
+<!-- ===================== TITLE / INTRO ===================== -->
+<div style="position:absolute;left:80px;top:36px;width:1140px;font-family:'Barlow',sans-serif">
+  <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:46px;letter-spacing:.04em;line-height:.95;background:linear-gradient(180deg,#F0D27E,#C8A24A 55%,#7d6128);-webkit-background-clip:text;background-clip:text;color:transparent">DEADLOCK MATCH REPORT · AESTHETIC DIRECTIONS</div>
+  <div style="margin-top:8px;color:#6f6857;font-size:14px;max-width:760px;line-height:1.5">Four ways to dress the <b style="color:#9b937f">Warden — Defeat</b> coaching report in Deadlock's identity. Same content, same data, four skins — all brass-on-teal-black, condensed deco display + clean sans. Pan across, then tell me which to build out (mix &amp; match welcome).</div>
+</div>
+
+<!-- ===================== STICKY NOTE ===================== -->
+<div style="position:absolute;left:1360px;top:30px;width:300px;background:#f2e4a8;color:#3a2f12;padding:14px 15px;font:13px/1.45 'Barlow',sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.5);transform:rotate(1.4deg);border-radius:1px">
+  <b style="font-family:'Big Shoulders Display';font-size:15px;letter-spacing:.03em;text-transform:uppercase">On the real assets</b><br>
+  Item icons are color-coded in Deadlock — <b>Weapon</b> amber, <b>Vitality</b> green, <b>Spirit</b> violet — so every item chip carries its category. Hero portraits + item icons resolve from <b>assets.deadlock-api.com</b> when ported into <b>dashboard.py</b> (server-side fetch). Warden's portrait below is the live asset.
+</div>
+
+<!-- ============================================================= -->
+<!-- DIRECTION 1 — BRASS HUD (in-game replica)                     -->
+<!-- ============================================================= -->
+<div style="position:absolute;left:80px;top:240px;width:500px;font-family:'Barlow',sans-serif">
+  <div data-drags-parent="1" style="position:absolute;top:-26px;left:2px;font-family:'Big Shoulders Display';font-weight:700;font-size:15px;letter-spacing:.16em;color:#C8A24A;text-transform:uppercase">01 · Brass HUD</div>
+  <div style="position:relative;background:linear-gradient(180deg,#141925 0%,#0e121b 100%);border:1px solid #6c552a;box-shadow:inset 0 0 0 1px #2a2f3d, inset 0 0 0 3px #b8923f33, 0 14px 40px rgba(0,0,0,.55);padding:0;overflow:hidden">
+    <div style="position:absolute;inset:0;pointer-events:none;opacity:.05;mix-blend-mode:overlay;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;);background-size:160px 160px;animation:dirgrain 1.2s steps(2) infinite"></div>
+    <!-- corner brackets -->
+    <div style="position:absolute;top:7px;left:7px;width:16px;height:16px;border-top:2px solid #E7C66B;border-left:2px solid #E7C66B;opacity:.85"></div>
+    <div style="position:absolute;top:7px;right:7px;width:16px;height:16px;border-top:2px solid #E7C66B;border-right:2px solid #E7C66B;opacity:.85"></div>
+    <div style="position:absolute;bottom:7px;left:7px;width:16px;height:16px;border-bottom:2px solid #E7C66B;border-left:2px solid #E7C66B;opacity:.85"></div>
+    <div style="position:absolute;bottom:7px;right:7px;width:16px;height:16px;border-bottom:2px solid #E7C66B;border-right:2px solid #E7C66B;opacity:.85"></div>
+
+    <!-- header -->
+    <div style="position:relative;padding:22px 24px 18px;display:flex;gap:16px;align-items:flex-end">
+      <div style="width:74px;height:90px;flex:0 0 auto;border:1px solid #6c552a;box-shadow:inset 0 0 0 1px #00000080;background:#0b0e14;overflow:hidden;position:relative"><img src="https://assets.deadlock-api.com/images/heroes/warden_card.png" alt="Warden" style="width:100%;height:100%;object-fit:cover;object-position:center top;filter:saturate(.9)"></div>
+      <div style="flex:1">
+        <div style="font-family:'Big Shoulders Display';font-weight:600;font-size:12px;letter-spacing:.34em;color:#C04A3C;text-transform:uppercase">◆ Defeat · 38:22</div>
+        <div style="font-family:'Big Shoulders Display';font-weight:800;font-size:54px;line-height:.82;letter-spacing:.02em;background:linear-gradient(180deg,#F4D888,#C8A24A 60%,#7d6128);-webkit-background-clip:text;background-clip:text;color:transparent;margin-top:2px">WARDEN</div>
+        <div style="margin-top: 5px; color: #8c8470; font-size: 12.5px; letter-spacing: .04em; display: block">2 / 9 / 5 &nbsp;·&nbsp; <span style="color:#2ADFFC">36,668 souls</span> &nbsp;·&nbsp; match 91282802</div>
+      </div>
+    </div>
+    <div style="height:2px;margin:0 22px;background:linear-gradient(90deg,transparent,#C8A24A66 12%,#C8A24A 50%,#C8A24A66 88%,transparent)"></div>
+
+    <!-- stat strip -->
+    <div style="position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 22px 6px">
+      <div style="background:linear-gradient(180deg,#1b2130,#11151e);border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:9px 10px"><div style="font-size: 9.5px; letter-spacing: .14em; color: #7b7363; text-transform: uppercase; font-weight: 700">Souls/min</div><div style="font-family:'Big Shoulders Display';font-weight:700;font-size:22px;color:#e8e0cf">956</div></div>
+      <div style="background:linear-gradient(180deg,#1b2130,#11151e);border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:9px 10px"><div style="font-size: 9.5px; letter-spacing: .14em; color: #7b7363; text-transform: uppercase; font-weight: 700">Deaths</div><div style="font-family:'Big Shoulders Display';font-weight:700;font-size:22px;color:#C8413B">9</div></div>
+      <div style="background:linear-gradient(180deg,#1b2130,#11151e);border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:9px 10px"><div style="font-size: 9.5px; letter-spacing: .14em; color: #7b7363; text-transform: uppercase; font-weight: 700">Net worth</div><div style="font-family:'Big Shoulders Display';font-weight:700;font-size:22px;color:#e8e0cf">36.7k</div></div>
+      <div style="background:linear-gradient(180deg,#1b2130,#11151e);border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:9px 10px"><div style="font-size: 9.5px; letter-spacing: .14em; color: #7b7363; text-transform: uppercase; font-weight: 700">Self-dmg</div><div style="font-family:'Big Shoulders Display';font-weight:700;font-size:22px;color:#D9A441">24.6k</div></div>
+    </div>
+
+    <!-- verdict -->
+    <div style="position:relative;margin:12px 22px;padding:13px 15px 13px 17px;background:#0d111a;border:1px solid #232a3a;border-left:3px solid #C8A24A">
+      <div style="font-family: 'Big Shoulders Display'; font-weight: 900; font-size: 16px; letter-spacing: 0.06em; color: #C8A24A; text-transform: uppercase; margin-bottom: 5px; line-height: 1.5">VERDICT</div>
+      <div style="color:#c3bca9;font-size:13px;line-height:1.55">Lost on identity and survivability, not on farm. You built one of the tankiest frontliners as a pure gun carry — seven weapon items, one vitality, <b style="color:#e8e0cf">zero armour</b> — and were bursted in seconds.</div>
+    </div>
+
+    <!-- soul lead chart mock -->
+    <div style="position: relative; margin: 12px 22px; padding: 12px 14px 8px; background: #0d111a; border: 1px solid #232a3a; width: 422px; height: 163px">
+      <div style="font-size: 12px; letter-spacing: .14em; color: #7b7363; text-transform: uppercase; margin-bottom: 6px; font-weight: 700">Soul lead · +173 → −66,799</div>
+      <svg viewBox="0 0 260 64" width="100%" height="58" preserveAspectRatio="none" style="width: 430px; height: 136px">
+        <line x1="0" y1="20" x2="260" y2="20" stroke="#39414f" stroke-dasharray="2 3"></line>
+        <path d="M0,18 L28,26 L56,34 L96,46 L130,42 L168,50 L210,58 L260,63 L260,64 L0,64 Z" fill="#C8413B22"></path>
+        <path d="M0,18 L28,26 L56,34 L96,46 L130,42 L168,50 L210,58 L260,63" fill="none" stroke="#2ADFFC" stroke-width="2"></path>
+        <line x1="60" y1="0" x2="60" y2="64" stroke="#C8413B" stroke-width="1" stroke-dasharray="2 2" opacity=".6"></line>
+        <line x1="150" y1="0" x2="150" y2="64" stroke="#C8413B" stroke-width="1" stroke-dasharray="2 2" opacity=".6"></line>
+      </svg>
+    </div>
+
+    <!-- phase trichotomy -->
+    <div style="position: relative; margin: 12px 22px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 44px; margin-bottom: 44px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span style="font-family:'Big Shoulders Display';font-weight:700;font-size:16px;letter-spacing:.1em;color:#e8e0cf">LANING</span><span style="font-size:11px;color:#7b7363;letter-spacing:.1em">0:00–10:00</span><span style="flex:1;height:1px;background:#2a3144"></span></div>
+      <div style="display:flex;gap:9px;margin-bottom:7px"><span style="flex:0 0 auto;align-self:flex-start;font:700 9.5px 'Barlow Semi Condensed';letter-spacing:.1em;color:#6FA84B;background:#6FA84B1f;border:1px solid #6FA84B55;padding:3px 7px;text-transform:uppercase">Did well</span><span style="color:#b6af9d;font-size:12.5px;line-height:1.45">Survived to 10:00 on one death — kept you in the game.</span></div>
+      <div style="display:flex;gap:9px"><span style="flex:0 0 auto;align-self:flex-start;font:700 9.5px 'Barlow Semi Condensed';letter-spacing:.1em;color:#C8413B;background:#C8413B1f;border:1px solid #C8413B55;padding:3px 7px;text-transform:uppercase">Cost you</span><span style="color:#b6af9d;font-size:12.5px;line-height:1.45">Took 5,318 but dealt only 2,381 — lost the trades 2-to-1.</span></div>
+    </div>
+
+    <!-- item suggestion chips -->
+    <div style="position:relative;margin:14px 22px 22px">
+      <div style="font-size: 12px; letter-spacing: .14em; color: #7b7363; text-transform: uppercase; margin-bottom: 8px; font-weight: 900">Buy next game</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;gap:11px;background:linear-gradient(90deg,#16140f,#11151e);border:1px solid #2a3144;padding:8px 10px">
+          <div style="width:40px;height:40px;flex:0 0 auto;background:linear-gradient(160deg,#3c5a2a,#24371a);border:1px solid #6FA84B;display:grid;place-items:center;box-shadow:inset 0 0 10px #00000066"><div style="width:18px;height:18px;border:2px solid #b6e09a;border-radius:3px;transform:rotate(45deg)"></div></div>
+          <div style="flex:1"><div style="font-family:'Big Shoulders Display';font-weight:600;font-size:16px;color:#e8e0cf;letter-spacing:.02em">Improved Bullet Armour</div><div style="font-size:10.5px;color:#6FA84B;letter-spacing:.08em;text-transform:uppercase">Vitality · 3,000</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:11px;background:linear-gradient(90deg,#16140f,#11151e);border:1px solid #2a3144;padding:8px 10px">
+          <div style="width:40px;height:40px;flex:0 0 auto;background:linear-gradient(160deg,#5a3a6a,#371a44);border:1px solid #B07BD6;display:grid;place-items:center;box-shadow:inset 0 0 10px #00000066"><div style="width:16px;height:16px;border:2px solid #e0c0f5;border-radius:50%"></div></div>
+          <div style="flex:1"><div style="font-family:'Big Shoulders Display';font-weight:600;font-size:16px;color:#e8e0cf;letter-spacing:.02em">Improved Spirit Armour</div><div style="font-size:10.5px;color:#B07BD6;letter-spacing:.08em;text-transform:uppercase">Spirit · 3,200</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- DIRECTION 2 — GRIMOIRE / CASE FILE (occult)                   -->
+<!-- ============================================================= -->
+<div style="position:absolute;left:620px;top:240px;width:500px;font-family:'Barlow',sans-serif">
+  <div data-drags-parent="1" style="position:absolute;top:-26px;left:2px;font-family:'Big Shoulders Display';font-weight:700;font-size:15px;letter-spacing:.16em;color:#C8A24A;text-transform:uppercase">02 · Grimoire</div>
+  <div style="position:relative;background:radial-gradient(120% 80% at 50% 0%,#1c1410 0%,#140f0c 60%,#0d0a08 100%);border:1px solid #5a4424;box-shadow:inset 0 0 0 1px #00000099,inset 0 0 40px #00000088, 0 14px 40px rgba(0,0,0,.6);padding:0;overflow:hidden">
+    <div style="position:absolute;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:overlay;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;);background-size:180px 180px"></div>
+    <!-- sigil watermark -->
+    <div style="position:absolute;top:64px;left:50%;transform:translateX(-50%);width:300px;height:300px;border:1px solid #C8A24A;border-radius:50%;opacity:.05;pointer-events:none"></div>
+    <div style="position:absolute;top:104px;left:50%;transform:translateX(-50%);width:200px;height:200px;border:1px solid #C8A24A;opacity:.05;transform:translateX(-50%) rotate(45deg);pointer-events:none"></div>
+
+    <div style="position:relative;padding:24px 26px 16px;text-align:center">
+      <div style="font-family:'Barlow Semi Condensed';font-weight:600;font-size:11px;letter-spacing:.34em;color:#9a7b3d;text-transform:uppercase">Case № 91282802 — A defeat examined</div>
+      <div style="font-family:'Cinzel';font-weight:800;font-size:42px;line-height:1;letter-spacing:.04em;color:#E7C66B;margin-top:10px;text-shadow:0 2px 0 #00000088">WARDEN</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px"><span style="width:42px;height:1px;background:#7d6128"></span><span style="color:#C8413B;font-family:'Cinzel';font-size:12px;letter-spacing:.2em">DEFEAT · 38:22</span><span style="width:42px;height:1px;background:#7d6128"></span></div>
+    </div>
+
+    <!-- ledger stat rows -->
+    <div style="position:relative;margin:6px 26px 0;border-top:1px solid #3a2c16;border-bottom:1px solid #3a2c16">
+      <div style="display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px dashed #2c2113"><span style="color:#8c7c5a;font-size:12px;letter-spacing:.08em;font-family:'Cinzel'">Slain</span><span style="font-family:'Cinzel';font-weight:700;color:#C8413B;font-size:15px">9 times</span></div>
+      <div style="display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px dashed #2c2113"><span style="color:#8c7c5a;font-size:12px;letter-spacing:.08em;font-family:'Cinzel'">Souls amassed</span><span style="font-family:'Cinzel';font-weight:700;color:#2ADFFC;font-size:15px">36,668</span></div>
+      <div style="display:flex;justify-content:space-between;padding:8px 2px"><span style="color:#8c7c5a;font-size:12px;letter-spacing:.08em;font-family:'Cinzel'">Blood spent (self)</span><span style="font-family:'Cinzel';font-weight:700;color:#D9A441;font-size:15px">24,575</span></div>
+    </div>
+
+    <div style="position:relative;margin:16px 26px;color:#bcae92;font-size:13px;line-height:1.6;font-style:italic;text-align:center">"Built the tankiest frontliner as a pure gun carry, took no armour, and let Blood Tribute drain more health than any foe did."</div>
+
+    <!-- wax-seal trichotomy -->
+    <div style="position:relative;margin:14px 26px">
+      <div style="text-align:center;font-family:'Cinzel';font-weight:700;font-size:15px;letter-spacing:.12em;color:#E7C66B">— LANING · 0:00–10:00 —</div>
+      <div style="display:flex;gap:12px;margin-top:12px;align-items:flex-start">
+        <div style="flex:0 0 auto;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#6FA84B,#34521f);box-shadow:inset 0 -3px 6px #00000066,0 2px 4px #00000088;display:grid;place-items:center;font:700 9px 'Barlow Semi Condensed';letter-spacing:.06em;color:#dff0cf;text-transform:uppercase;text-align:center">Did<br>well</div>
+        <div style="color:#b6af9d;font-size:12.5px;line-height:1.5;padding-top:6px">Survived to 10:00 on a single death, keeping the game alive.</div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:11px;align-items:flex-start">
+        <div style="flex:0 0 auto;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#C8413B,#5e1814);box-shadow:inset 0 -3px 6px #00000066,0 2px 4px #00000088;display:grid;place-items:center;font:700 9px 'Barlow Semi Condensed';letter-spacing:.06em;color:#f5d3cf;text-transform:uppercase;text-align:center">Cost<br>you</div>
+        <div style="color:#b6af9d;font-size:12.5px;line-height:1.5;padding-top:6px">Took 5,318, dealt 2,381 — lost the lane trades two-to-one.</div>
+      </div>
+    </div>
+
+    <!-- relic item -->
+    <div style="position:relative;margin:16px 26px 24px;border:1px solid #3a2c16;background:#120d09;padding:11px 13px;display:flex;gap:12px;align-items:center">
+      <div style="width:44px;height:44px;flex:0 0 auto;background:linear-gradient(160deg,#3c5a2a,#1f2f15);border:1px solid #6FA84B;display:grid;place-items:center"><div style="width:18px;height:18px;border:2px solid #b6e09a;border-radius:3px;transform:rotate(45deg)"></div></div>
+      <div style="flex:1"><div style="font-family:'Cinzel';font-weight:700;font-size:15px;color:#E7C66B">Improved Bullet Armour</div><div style="font-size:10.5px;color:#6FA84B;letter-spacing:.1em;text-transform:uppercase;font-family:'Barlow Semi Condensed'">The remedy you never bought · Vitality</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- DIRECTION 3 — DECO TELEMETRY (clean, data-forward)            -->
+<!-- ============================================================= -->
+<div style="position:absolute;left:1160px;top:240px;width:500px;font-family:'Barlow',sans-serif">
+  <div data-drags-parent="1" style="position:absolute;top:-26px;left:2px;font-family:'Big Shoulders Display';font-weight:700;font-size:15px;letter-spacing:.16em;color:#C8A24A;text-transform:uppercase">03 · Deco Telemetry</div>
+  <div style="position:relative;background:#0c1118;border:1px solid #233040;box-shadow:0 14px 40px rgba(0,0,0,.5);padding:0;overflow:hidden">
+    <!-- top chevron bar -->
+    <div style="height:5px;background:repeating-linear-gradient(135deg,#C8A24A 0 10px,#0c1118 10px 20px);opacity:.85"></div>
+
+    <div style="padding:22px 24px 14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end">
+        <div>
+          <div style="font-family:'Barlow Semi Condensed';font-weight:600;font-size:11px;letter-spacing:.26em;color:#C8413B;text-transform:uppercase">Defeat</div>
+          <div style="font-family:'Big Shoulders Display';font-weight:800;font-size:46px;line-height:.85;letter-spacing:.02em;color:#eef1f6">WARDEN</div>
+        </div>
+        <div style="text-align:right;font-family:'Big Shoulders Display'"><div style="font-weight:700;font-size:30px;color:#C8A24A;line-height:1">38:22</div><div style="font-size:11px;color:#5f6b7d;letter-spacing:.1em">2 / 9 / 5</div></div>
+      </div>
+    </div>
+    <div style="height:1px;margin:0 24px;background:#233040"></div>
+
+    <!-- inline metric ticks -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);padding:16px 24px 4px;gap:2px">
+      <div style="border-left:2px solid #C8A24A;padding-left:9px"><div style="font-family:'Big Shoulders Display';font-weight:700;font-size:21px;color:#eef1f6">956</div><div style="font-size:9px;letter-spacing:.12em;color:#5f6b7d;text-transform:uppercase">souls/min</div></div>
+      <div style="border-left:2px solid #C8413B;padding-left:9px"><div style="font-family:'Big Shoulders Display';font-weight:700;font-size:21px;color:#eef1f6">9</div><div style="font-size:9px;letter-spacing:.12em;color:#5f6b7d;text-transform:uppercase">deaths</div></div>
+      <div style="border-left:2px solid #2ADFFC;padding-left:9px"><div style="font-family:'Big Shoulders Display';font-weight:700;font-size:21px;color:#eef1f6">36.7k</div><div style="font-size:9px;letter-spacing:.12em;color:#5f6b7d;text-transform:uppercase">net worth</div></div>
+      <div style="border-left:2px solid #D9A441;padding-left:9px"><div style="font-family:'Big Shoulders Display';font-weight:700;font-size:21px;color:#eef1f6">34%</div><div style="font-size:9px;letter-spacing:.12em;color:#5f6b7d;text-transform:uppercase">accuracy</div></div>
+    </div>
+
+    <!-- big chart -->
+    <div style="margin:16px 24px;background:#0a0e14;border:1px solid #1c2735;padding:12px 14px 6px">
+      <div style="display:flex;justify-content:space-between;font-size:10px;letter-spacing:.12em;color:#5f6b7d;text-transform:uppercase;margin-bottom:6px"><span>Soul lead</span><span style="color:#C8413B">−66,799</span></div>
+      <svg viewBox="0 0 280 96" width="100%" height="92" preserveAspectRatio="none">
+        <line x1="0" y1="26" x2="280" y2="26" stroke="#1c2735" stroke-dasharray="3 3"></line>
+        <path d="M0,24 L30,34 L62,46 L104,64 L140,58 L182,70 L228,84 L280,92 L280,96 L0,96 Z" fill="url(#g3)"></path>
+        <path d="M0,24 L30,34 L62,46 L104,64 L140,58 L182,70 L228,84 L280,92" fill="none" stroke="#2ADFFC" stroke-width="2.2"></path>
+        <defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2ADFFC44"></stop><stop offset="1" stop-color="#2ADFFC00"></stop></linearGradient></defs>
+        <circle cx="62" cy="46" r="2.5" fill="#C8413B"></circle><circle cx="182" cy="70" r="2.5" fill="#C8413B"></circle><circle cx="228" cy="84" r="2.5" fill="#C8413B"></circle>
+      </svg>
+    </div>
+
+    <!-- phase trichotomy minimal -->
+    <div style="margin:14px 24px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-family:'Big Shoulders Display';font-weight:700;font-size:15px;letter-spacing:.08em;color:#eef1f6">LANING</span><span style="font-size:10px;color:#5f6b7d;letter-spacing:.1em">0:00–10:00</span></div>
+      <div style="display:flex;align-items:baseline;gap:10px;padding:7px 0;border-top:1px solid #1c2735"><span style="font:700 10px 'Barlow Semi Condensed';letter-spacing:.1em;color:#6FA84B;text-transform:uppercase;min-width:62px">Did well</span><span style="color:#aab4c2;font-size:12.5px;line-height:1.45">Survived to 10:00 on one death.</span></div>
+      <div style="display:flex;align-items:baseline;gap:10px;padding:7px 0;border-top:1px solid #1c2735"><span style="font:700 10px 'Barlow Semi Condensed';letter-spacing:.1em;color:#C8413B;text-transform:uppercase;min-width:62px">Cost you</span><span style="color:#aab4c2;font-size:12.5px;line-height:1.45">Lost the trades 2-to-1: took 5,318, dealt 2,381.</span></div>
+    </div>
+
+    <!-- item chips compact -->
+    <div style="margin:14px 24px 22px;display:flex;gap:8px">
+      <div style="flex:1;display:flex;align-items:center;gap:9px;background:#0f1620;border:1px solid #1c2735;border-bottom:2px solid #6FA84B;padding:8px 9px">
+        <div style="width:30px;height:30px;flex:0 0 auto;background:linear-gradient(160deg,#3c5a2a,#24371a);display:grid;place-items:center"><div style="width:13px;height:13px;border:2px solid #b6e09a;transform:rotate(45deg)"></div></div>
+        <div><div style="font-family:'Barlow Semi Condensed';font-weight:600;font-size:12.5px;color:#eef1f6;line-height:1.1">Bullet Armour</div><div style="font-size:9px;color:#6FA84B;letter-spacing:.08em;text-transform:uppercase">Vitality</div></div>
+      </div>
+      <div style="flex:1;display:flex;align-items:center;gap:9px;background:#0f1620;border:1px solid #1c2735;border-bottom:2px solid #B07BD6;padding:8px 9px">
+        <div style="width:30px;height:30px;flex:0 0 auto;background:linear-gradient(160deg,#5a3a6a,#371a44);display:grid;place-items:center"><div style="width:12px;height:12px;border:2px solid #e0c0f5;border-radius:50%"></div></div>
+        <div><div style="font-family:'Barlow Semi Condensed';font-weight:600;font-size:12.5px;color:#eef1f6;line-height:1.1">Spirit Armour</div><div style="font-size:9px;color:#B07BD6;letter-spacing:.08em;text-transform:uppercase">Spirit</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- DIRECTION 4 — PLAYBILL / SUNBURST (theatrical)                -->
+<!-- ============================================================= -->
+<div style="position:absolute;left:1700px;top:240px;width:500px;font-family:'Barlow',sans-serif">
+  <div data-drags-parent="1" style="position:absolute;top:-26px;left:2px;font-family:'Big Shoulders Display';font-weight:700;font-size:15px;letter-spacing:.16em;color:#C8A24A;text-transform:uppercase">04 · Playbill</div>
+  <div style="position:relative;background:#0a0907;border:2px solid #7d6128;box-shadow:inset 0 0 0 4px #0a0907,inset 0 0 0 5px #3a2c16,0 14px 40px rgba(0,0,0,.6);padding:0;overflow:hidden">
+    <!-- sunburst -->
+    <div style="position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:520px;height:520px;background:repeating-conic-gradient(from 0deg,#C8A24A14 0deg 6deg,transparent 6deg 12deg);pointer-events:none"></div>
+    <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(80% 50% at 50% 12%,#C8A24A18,transparent 70%)"></div>
+
+    <div style="position:relative;padding:24px 26px 10px;text-align:center">
+      <div style="font-family:'Cinzel';font-weight:600;font-size:11px;letter-spacing:.3em;color:#9a7b3d">— THE MANAGEMENT PRESENTS —</div>
+      <div style="font-family:'Big Shoulders Display';font-weight:900;font-size:62px;line-height:.82;letter-spacing:.02em;background:linear-gradient(180deg,#F8E4A0,#C8A24A 55%,#6b5223);-webkit-background-clip:text;background-clip:text;color:transparent;margin-top:8px">WARDEN</div>
+      <div style="font-family:'Cinzel';font-weight:700;font-size:14px;letter-spacing:.14em;color:#C8413B;margin-top:6px">A DEFEAT IN FOUR ACTS</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px"><span style="width:60px;height:1px;background:linear-gradient(90deg,transparent,#7d6128)"></span><span style="color:#7d6128;font-size:14px">✦</span><span style="width:60px;height:1px;background:linear-gradient(90deg,#7d6128,transparent)"></span></div>
+    </div>
+
+    <div style="position:relative;text-align:center;color:#c3b58f;font-size:12.5px;letter-spacing:.06em;padding:4px 30px 14px;line-height:1.6">38:22 &nbsp;·&nbsp; 2 / 9 / 5 &nbsp;·&nbsp; <span style="color:#2ADFFC">36,668 souls</span><br>Beaten by Venator, Lady Geist &amp; Mirage</div>
+
+    <!-- act / phase as billing -->
+    <div style="position:relative;margin:6px 26px;border-top:1px solid #3a2c16;border-bottom:1px solid #3a2c16;padding:14px 0;text-align:center">
+      <div style="font-family:'Cinzel';font-weight:700;font-size:13px;letter-spacing:.18em;color:#E7C66B">ACT I · LANING</div>
+      <div style="margin-top:9px;color:#6FA84B;font-family:'Barlow Semi Condensed';font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase">Did well</div>
+      <div style="color:#bcae92;font-size:12.5px;line-height:1.5;margin-top:2px">Survived to ten minutes on a single death.</div>
+      <div style="margin-top:9px;color:#C8413B;font-family:'Barlow Semi Condensed';font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase">Cost you</div>
+      <div style="color:#bcae92;font-size:12.5px;line-height:1.5;margin-top:2px">Lost the lane trades two-to-one.</div>
+    </div>
+
+    <!-- billing-style item credit -->
+    <div style="position:relative;margin:16px 26px 6px;text-align:center">
+      <div style="font-family:'Cinzel';font-size:11px;letter-spacing:.2em;color:#9a7b3d">FEATURING THE REMEDIES</div>
+    </div>
+    <div style="position:relative;margin:8px 26px 24px;display:flex;justify-content:center;gap:14px">
+      <div style="text-align:center">
+        <div style="width:50px;height:50px;margin:0 auto;background:linear-gradient(160deg,#3c5a2a,#1f2f15);border:1px solid #6FA84B;display:grid;place-items:center;box-shadow:0 0 16px #6FA84B33"><div style="width:20px;height:20px;border:2px solid #b6e09a;border-radius:3px;transform:rotate(45deg)"></div></div>
+        <div style="font-family:'Cinzel';font-size:11px;color:#E7C66B;margin-top:6px;line-height:1.2;max-width:80px">Bullet Armour</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:50px;height:50px;margin:0 auto;background:linear-gradient(160deg,#5a3a6a,#371a44);border:1px solid #B07BD6;display:grid;place-items:center;box-shadow:0 0 16px #B07BD633"><div style="width:18px;height:18px;border:2px solid #e0c0f5;border-radius:50%"></div></div>
+        <div style="font-family:'Cinzel';font-size:11px;color:#E7C66B;margin-top:6px;line-height:1.2;max-width:80px">Spirit Armour</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:50px;height:50px;margin:0 auto;background:linear-gradient(160deg,#a8642a,#5e3414);border:1px solid #C56B2C;display:grid;place-items:center;box-shadow:0 0 16px #C56B2C33"><div style="width:18px;height:6px;background:#f0c79a;transform:rotate(-20deg)"></div></div>
+        <div style="font-family:'Cinzel';font-size:11px;color:#E7C66B;margin-top:6px;line-height:1.2;max-width:80px">Knockdown</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- bottom note -->
+<div style="position:absolute;left:1700px;top:1180px;width:300px;background:#f2e4a8;color:#3a2f12;padding:14px 15px;font:13px/1.45 'Barlow',sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.5);transform:rotate(-1.2deg);border-radius:1px">
+  <b style="font-family:'Big Shoulders Display';font-size:15px;letter-spacing:.03em;text-transform:uppercase">Pick one (or remix)</b><br>
+  e.g. "Brass HUD frames + Playbill's act structure," or "Telemetry charts in the Grimoire shell." The winner gets the full report: all 7 charts restyled, every phase, targeting, and the full scoreboard.
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;500;600;700;800;900&amp;family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Barlow+Semi+Condensed:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#0a0d13;color:#e8e0cf;font-family:'Barlow',system-ui,sans-serif;line-height:1.5}
+a{text-decoration:none}
+summary::-webkit-details-marker{display:none}
+summary::marker{content:''}
+::selection{background:#C8A24A55}
+</style>
+</helmet>
+
+<div style="position:relative;min-height:100vh;background:#0a0d13">
+  <!-- texture + vignette overlays -->
+  <div style="position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.045;mix-blend-mode:overlay;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;);background-size:180px 180px"></div>
+  <div style="position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(120% 80% at 50% -10%,#15243033,transparent 60%),radial-gradient(100% 60% at 50% 120%,#1a140833,transparent 60%)"></div>
+
+  <!-- =============== STICKY HEADER =============== -->
+  <header style="position: sticky; top: 0px; z-index: 20; background: rgba(10,13,19,.93); backdrop-filter: blur(9px); border-bottom: 1px solid #6c552a55">
+    <div style="max-width:1100px;margin:0 auto;padding:13px 26px">
+      <div style="display:flex;align-items:baseline;gap:13px;flex-wrap:wrap">
+        <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:27px;letter-spacing:.04em;line-height:1;background:linear-gradient(180deg,#F4D888,#C8A24A 60%,#7d6128);-webkit-background-clip:text;background-clip:text;color:transparent">WARDEN</div>
+        <span style="font-family:'Big Shoulders Display',sans-serif;font-weight:600;font-size:12px;letter-spacing:.3em;color:#C04A3C;text-transform:uppercase">◆ Defeat</span>
+        <span style="color:#a89f8a;font-size:14px;letter-spacing:.03em">38:22 &nbsp;·&nbsp; 2 / 9 / 5 &nbsp;·&nbsp; <span style="color:#2ADFFC">36,668 souls</span> &nbsp;·&nbsp; <span style="color:#847c6a">match 91282802</span></span>
+      </div>
+      <nav style="display:flex;gap:6px;flex-wrap:wrap;margin-top:11px">
+        <a href="#overview" style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#a89f8a;padding:4px 11px;border:1px solid #2a3144;background:#11151d" style-hover="color:#e8e0cf;border-color:#C8A24A">Overview</a>
+        <a href="#charts" style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#a89f8a;padding:4px 11px;border:1px solid #2a3144;background:#11151d" style-hover="color:#e8e0cf;border-color:#C8A24A">Charts</a>
+        <a href="#laning" style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#a89f8a;padding:4px 11px;border:1px solid #2a3144;background:#11151d" style-hover="color:#e8e0cf;border-color:#C8A24A">Laning</a>
+        <a href="#earlymid" style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#a89f8a;padding:4px 11px;border:1px solid #2a3144;background:#11151d" style-hover="color:#e8e0cf;border-color:#C8A24A">Early-mid</a>
+        <a href="#mid" style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#a89f8a;padding:4px 11px;border:1px solid #2a3144;background:#11151d" style-hover="color:#e8e0cf;border-color:#C8A24A">Mid</a>
+        <a href="#late" style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#a89f8a;padding:4px 11px;border:1px solid #2a3144;background:#11151d" style-hover="color:#e8e0cf;border-color:#C8A24A">Late</a>
+        <a href="#targeting" style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#a89f8a;padding:4px 11px;border:1px solid #2a3144;background:#11151d" style-hover="color:#e8e0cf;border-color:#C8A24A">Targeting</a>
+        <a href="#scoreboard" style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#a89f8a;padding:4px 11px;border:1px solid #2a3144;background:#11151d" style-hover="color:#e8e0cf;border-color:#C8A24A">Scoreboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <main style="position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:0 26px 70px">
+
+    <!-- =============== OVERVIEW =============== -->
+    <section id="overview" data-screen-label="Overview" data-comment-anchor="overview" style="padding:34px 0 8px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="width:90px;height:112px;flex:0 0 auto;border:1px solid #6c552a;box-shadow:inset 0 0 0 1px #00000080,0 6px 18px #00000066;background:#0b0e14;overflow:hidden;position:relative">
+          <img src="https://assets.deadlock-api.com/images/heroes/warden_card.png" alt="Warden" style="width:100%;height:100%;object-fit:cover;object-position:center top;filter:saturate(.92) contrast(1.03)">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,#0a0d13cc)"></div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:12px;letter-spacing:.28em;color:#9a7b3d;text-transform:uppercase">MATCH REPORT</div>
+          <h1 style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:58px;line-height:.84;letter-spacing:.02em;margin:4px 0 0;background:linear-gradient(180deg,#F4D888,#C8A24A 60%,#7d6128);-webkit-background-clip:text;background-clip:text;color:transparent">WARDEN — DEFEAT</h1>
+          <div style="margin-top: 8px; color: #a89f8a; font-size: 19.5px; letter-spacing: .03em; font-weight: 700">38:22 · You went 2 / 9 / 5 · 36,668 souls · beaten mainly by Venator, Lady Geist &amp; Mirage</div>
+        </div>
+      </div>
+
+      <!-- headline stat strip -->
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:18px 0 20px">
+        <div style="background:linear-gradient(180deg,#1b2130,#11151e);border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:10px 12px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Souls/min</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:24px;color:#e8e0cf">956</div></div>
+        <div style="background:linear-gradient(180deg,#1b2130,#11151e);border:1px solid #2a3144;border-top:2px solid #C8413B;padding:10px 12px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Deaths</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:24px;color:#C8413B">9</div></div>
+        <div style="background:linear-gradient(180deg,#1b2130,#11151e);border:1px solid #2a3144;border-top:2px solid #2ADFFC;padding:10px 12px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Net worth</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:24px;color:#e8e0cf">36.7k</div></div>
+        <div style="background:linear-gradient(180deg,#1b2130,#11151e);border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:10px 12px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Hero dmg</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:24px;color:#e8e0cf">22.3k</div></div>
+        <div style="background:linear-gradient(180deg,#1b2130,#11151e);border:1px solid #2a3144;border-top:2px solid #C8413B;padding:10px 12px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Dmg taken</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:24px;color:#e8e0cf">35.4k</div></div>
+        <div style="background:linear-gradient(180deg,#1b2130,#11151e);border:1px solid #2a3144;border-top:2px solid #D9A441;padding:10px 12px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Self-dmg</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:24px;color:#D9A441">24.6k</div></div>
+      </div>
+
+      <!-- verdict panel -->
+      <div style="position:relative;background:linear-gradient(180deg,#141925,#0e121b);border:1px solid #6c552a55;box-shadow:inset 0 0 0 1px #2a2f3d;padding:22px 24px;overflow:hidden">
+        <div style="position:absolute;top:7px;left:7px;width:15px;height:15px;border-top:2px solid #C8A24A;border-left:2px solid #C8A24A;opacity:.8"></div>
+        <div style="position:absolute;top:7px;right:7px;width:15px;height:15px;border-top:2px solid #C8A24A;border-right:2px solid #C8A24A;opacity:.8"></div>
+        <div style="position:absolute;bottom:7px;left:7px;width:15px;height:15px;border-bottom:2px solid #C8A24A;border-left:2px solid #C8A24A;opacity:.8"></div>
+        <div style="position:absolute;bottom:7px;right:7px;width:15px;height:15px;border-bottom:2px solid #C8A24A;border-right:2px solid #C8A24A;opacity:.8"></div>
+        <div style="color:#d4cdba;font-size:16.5px;line-height:1.75;max-width:980px">This was lost on <b style="color:#e8e0cf">identity and survivability, not on farm</b>. Your souls-per-minute actually climbed hard in the mid and late game (488 in lane to 1,272 then 1,400), so the economy engine was fine once you got going. The problem is that you built Warden, one of the tankiest frontline initiators in the game, as a pure gun carry with <b style="color:#C56B2C">seven weapon items</b> and a single vitality item, and then took <b style="color:#C8413B">zero armour</b>. On a hero whose whole job is to stand in front and survive, that meant you were bursted in seconds (took 21,327 damage in the late game while dealing 15,505), died nine times, and your Blood Tribute drained <b style="color:#D9A441">24,575 of your own health</b> — more than you dealt to any single enemy. The soul lead collapsed from <span style="color:#6FA84B">+173 at 3:00</span> to <span style="color:#C8413B">−66,799</span> by the end, with the enemy taking the mid-boss twice unopposed. Fix the survivability and the target priority and games like this stay winnable.</div>
+      </div>
+
+      <!-- priorities -->
+      <div style="display:flex;align-items:center;gap:12px;margin:26px 0 4px">
+        <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;letter-spacing:.06em;color:#e8e0cf;margin:0;text-transform:uppercase">Top priorities next game</h2>
+        <span style="flex:1;height:2px;background:linear-gradient(90deg,#C8A24A,#C8A24A22 60%,transparent)"></span>
+        <span style="color:#7d6128">◆</span>
+      </div>
+      <ol style="list-style:none;padding:0;margin:12px 0 0">
+        <li style="position:relative;padding:14px 16px 14px 56px;background:#11151d;border:1px solid #232a3a;border-left:3px solid #C8A24A;margin:9px 0"><span style="position:absolute;left:14px;top:14px;width:28px;height:28px;display:grid;place-items:center;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:16px;color:#0a0d13;background:linear-gradient(180deg,#F4D888,#C8A24A)">1</span><div style="color:#d4cdba;font-size:15.5px;line-height:1.65"><b style="color:#e8e0cf">Buy armour.</b> On Warden you almost always want Improved Bullet Armour and Improved Spirit Armour by mid game. You bought neither — the single biggest reason you died nine times.</div></li>
+        <li style="position:relative;padding:14px 16px 14px 56px;background:#11151d;border:1px solid #232a3a;border-left:3px solid #C8A24A;margin:9px 0"><span style="position:absolute;left:14px;top:14px;width:28px;height:28px;display:grid;place-items:center;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:16px;color:#0a0d13;background:linear-gradient(180deg,#F4D888,#C8A24A)">2</span><div style="color:#d4cdba;font-size:15.5px;line-height:1.65"><b style="color:#e8e0cf">Reconsider Blood Tribute on a squishy build.</b> It cost you 24,575 self-damage with no armour to soak the trade. Either build the durability to use it, or replace it.</div></li>
+        <li style="position:relative;padding:14px 16px 14px 56px;background:#11151d;border:1px solid #232a3a;border-left:3px solid #C8A24A;margin:9px 0"><span style="position:absolute;left:14px;top:14px;width:28px;height:28px;display:grid;place-items:center;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:16px;color:#0a0d13;background:linear-gradient(180deg,#F4D888,#C8A24A)">3</span><div style="color:#d4cdba;font-size:15.5px;line-height:1.65"><b style="color:#e8e0cf">Stop fighting deep when behind.</b> Four of your nine deaths were late, several in the enemy jungle, each costing 70–82 seconds dead. When behind, group and defend rather than seeking solo fights.</div></li>
+      </ol>
+    </section>
+
+    <!-- =============== CHARTS =============== -->
+    <section id="charts" data-screen-label="Charts" style="padding:34px 0 8px;border-top:1px solid #1c2231;margin-top:30px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;letter-spacing:.06em;color:#e8e0cf;margin:0;text-transform:uppercase">The game at a glance</h2>
+        <span style="flex:1;height:2px;background:linear-gradient(90deg,#C8A24A,#C8A24A22 60%,transparent)"></span>
+        <span style="color:#7d6128">◆</span>
+      </div>
+
+      <div style="background:linear-gradient(180deg,#141925,#0e121b);border:1px solid #232a3a;border-top:2px solid #C8A24A;padding:14px 16px 6px">
+        <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:14px;letter-spacing:.06em;color:#C8A24A;text-transform:uppercase;margin-bottom:2px">Soul lead over time</div>
+        <div style="font-size:12.5px;color:#978d77;letter-spacing:.05em;margin-bottom:6px">Dotted red = your deaths · +173 at 3:00 collapses to −66,799</div>
+        <div id="soulLead" style="height:300px;width:100%"></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+        <div style="background:linear-gradient(180deg,#141925,#0e121b);border:1px solid #232a3a;border-top:2px solid #C8A24A;padding:14px 16px 6px">
+          <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:14px;letter-spacing:.06em;color:#C8A24A;text-transform:uppercase;margin-bottom:6px">Net worth · all players</div>
+          <div id="netWorth" style="height:300px;width:100%"></div>
+        </div>
+        <div style="background:linear-gradient(180deg,#141925,#0e121b);border:1px solid #232a3a;border-top:2px solid #C8A24A;padding:14px 16px 6px">
+          <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:14px;letter-spacing:.06em;color:#C8A24A;text-transform:uppercase;margin-bottom:6px">Your damage · dealt vs taken</div>
+          <div id="dmgChart" style="height:300px;width:100%"></div>
+        </div>
+      </div>
+
+      <div style="background:linear-gradient(180deg,#141925,#0e121b);border:1px solid #232a3a;border-top:2px solid #C8A24A;padding:14px 16px 6px;margin-top:12px">
+        <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:14px;letter-spacing:.06em;color:#C8A24A;text-transform:uppercase;margin-bottom:6px">Death cost · seconds spent dead</div>
+        <div id="deathCost" style="height:320px;width:100%"></div>
+      </div>
+    </section>
+
+    <!-- =============== LANING =============== -->
+    <section id="laning" data-screen-label="Laning" data-comment-anchor="laning" style="padding:34px 0 8px;border-top:1px solid #1c2231;margin-top:30px">
+      <div style="display:flex;align-items:baseline;gap:13px;margin-bottom:4px">
+        <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:30px;letter-spacing:.05em;color:#e8e0cf;margin:0;text-transform:uppercase">Laning</h2>
+        <span style="font-family:'Barlow Semi Condensed',sans-serif;font-size:13px;letter-spacing:.14em;color:#9a7b3d;text-transform:uppercase">0:00 – 10:00</span>
+        <span style="flex:1;height:2px;background:linear-gradient(90deg,#C8A24A,#C8A24A22 60%,transparent)"></span>
+      </div>
+      <p style="color:#cabd9f;font-size:16px;font-style:italic;margin:6px 0 14px;max-width:900px">Even on paper, but you lost the damage trades and the lane economy was slow.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Souls/min</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">488</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Souls</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">+4,880</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">K/D/A</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">0/1/0</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Hero dmg</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">2,381</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8413B;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Dmg taken</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#C8413B">5,318</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #D9A441;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Accuracy</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">38.0%</div></div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Economy</div>
+        <div style="padding:8px 16px 14px">
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#6FA84B;background:#6FA84B1f;border:1px solid #6FA84B55">Did well</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">Survived to 10 minutes without feeding hard (only one death), which kept you in the game.</span></div>
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#D9A441;background:#D9A4411f;border:1px solid #D9A44155">Hard to say</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">488 souls/min and 162 last hits across the game is on the low side, but Warden's slow bullet velocity makes early last-hitting genuinely hard — and you bought High-Velocity Rounds first, the correct fix.</span></div>
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex: 0 0 auto; align-self: flex-start; font: 700 11px 'Barlow Semi Condensed',sans-serif; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; color: #e07a75; background: #C8413B1f; border: 1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">You took 5,318 damage but dealt only 2,381 in lane. Losing trades that badly usually means farming too aggressively into poke rather than using Alchemical Flask to zone and last-hit safely.</span></div>
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#8b93a7;background:#8b93a71a;border:1px solid #8b93a744">Blind spot</span><span style="color:#b3aa93;font-size:15px;line-height:1.6;font-style:italic">The data can't tell whether you were solo-laning a tough matchup or got dived by a roamer.</span></div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Combat</div>
+        <div style="padding:8px 16px 14px">
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#D9A441;background:#D9A4411f;border:1px solid #D9A44155">Hard to say</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">Accuracy counts every shot including spray on creeps, so the raw number alone isn't conclusive.</span></div>
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#C8413B;background:#C8413B1f;border:1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">38% accuracy while losing trades 2-to-1. Warden wants to win extended trades with Willpower up, not poke battles.</span></div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Survivability</div>
+        <div style="padding:8px 16px 14px">
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex: 0 0 auto; align-self: flex-start; font: 700 11px 'Barlow Semi Condensed',sans-serif; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; color: #e38783; background: #C8413B1f; border: 1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">One death, but you soaked 5,318 damage with no defensive item bought. The chip you ate set the tone for a game you spent permanently low.</span></div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Itemisation</div>
+        <div style="padding:8px 16px 14px">
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#6FA84B;background:#6FA84B1f;border:1px solid #6FA84B55">Did well</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">High-Velocity Rounds first is the correct opener for Warden's slow bullets.</span></div>
+          <div style="display:flex;gap:10px;align-items:center;margin:10px 0 4px">
+            <div style="display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,#16140f,#11151e);border:1px solid #2a3144;border-left:3px solid #C56B2C;padding:7px 11px"><div style="width:34px;height:34px;flex:0 0 auto;background:linear-gradient(160deg,#a8642a,#5e3414);border:1px solid #C56B2C;display:grid;place-items:center"><div style="width:16px;height:5px;background:#f0c79a;transform:rotate(-22deg)"></div></div><div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:600;font-size:14px;color:#e8e0cf;line-height:1.05">High-Velocity Rounds</div><div style="font-size:11px;color:#C56B2C;letter-spacing:.1em;text-transform:uppercase">Weapon · bought</div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============== EARLY-MID =============== -->
+    <section id="earlymid" data-screen-label="Early-mid" data-comment-anchor="earlymid" style="padding:34px 0 8px;border-top:1px solid #1c2231;margin-top:30px">
+      <div style="display:flex;align-items:baseline;gap:13px;margin-bottom:4px">
+        <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:30px;letter-spacing:.05em;color:#e8e0cf;margin:0;text-transform:uppercase">Early-mid</h2>
+        <span style="font-family:'Barlow Semi Condensed',sans-serif;font-size:13px;letter-spacing:.14em;color:#9a7b3d;text-transform:uppercase">10:00 – 18:00</span>
+        <span style="flex:1;height:2px;background:linear-gradient(90deg,#C8A24A,#C8A24A22 60%,transparent)"></span>
+      </div>
+      <p style="color:#cabd9f;font-size:16px;font-style:italic;margin:6px 0 14px;max-width:900px">The worst stretch: three deaths and almost no damage output.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Souls/min</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">570</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Souls</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">+4,563</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8413B;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">K/D/A</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#C8413B">0/3/0</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8413B;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Hero dmg</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#C8413B">1,197</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8413B;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Dmg taken</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">3,834</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #D9A441;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Accuracy</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">43.4%</div></div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Economy</div>
+        <div style="padding:8px 16px 14px"><div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#6FA84B;background:#6FA84B1f;border:1px solid #6FA84B55">Did well</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">570 souls/min held up despite dying three times, so you were still farming between deaths.</span></div></div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Combat</div>
+        <div style="padding:8px 16px 14px"><div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#C8413B;background:#C8413B1f;border:1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">1,197 hero damage across this whole window while taking 3,834. You were present for fights but not contributing damage, which on Warden usually means engaging without Willpower or Last Stand ready.</span></div></div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Survivability</div>
+        <div style="padding:8px 16px 14px"><div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#C8413B;background:#C8413B1f;border:1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">Three deaths (Mirage, Abrams, Venator) in eight minutes. Still no armour purchased, so every enemy could burst you.</span></div></div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Itemisation</div>
+        <div style="padding:8px 16px 14px">
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#D9A441;background:#D9A4411f;border:1px solid #D9A44155">Hard to say</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">Imbuing Quicksilver Reload is a legitimate Warden pick (free reload on Alchemical Flask), so that purchase itself was reasonable.</span></div>
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#C8413B;background:#C8413B1f;border:1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">You went deeper into weapon items (Intensifying Magazine, Slowing Bullets) when the scoreline screamed for defence. This is where the gun-only plan started to hurt.</span></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <div style="display:flex;align-items:center;gap:9px;background:linear-gradient(90deg,#16140f,#11151e);border:1px solid #2a3144;border-left:3px solid #B07BD6;padding:7px 11px"><div style="width:30px;height:30px;flex:0 0 auto;background:linear-gradient(160deg,#5a3a6a,#371a44);border:1px solid #B07BD6;display:grid;place-items:center"><div style="width:13px;height:13px;border:2px solid #e0c0f5;border-radius:50%"></div></div><div><div style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:13px;color:#e8e0cf;line-height:1.05">Quicksilver Reload</div><div style="font-size:10.5px;color:#B07BD6;letter-spacing:.09em;text-transform:uppercase">Spirit · imbued</div></div></div>
+            <div style="display:flex;align-items:center;gap:9px;background:linear-gradient(90deg,#0f1410,#11151e);border:1px solid #2a3144;border-left:3px solid #6FA84B;padding:7px 11px"><div style="width:30px;height:30px;flex:0 0 auto;background:linear-gradient(160deg,#3c5a2a,#24371a);border:1px solid #6FA84B;display:grid;place-items:center"><div style="width:14px;height:14px;border:2px solid #b6e09a;border-radius:2px;transform:rotate(45deg)"></div></div><div><div style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:13px;color:#e8e0cf;line-height:1.05">Improved Bullet Armour</div><div style="font-size:10.5px;color:#6FA84B;letter-spacing:.09em;text-transform:uppercase">Vitality · the missing buy</div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============== MID =============== -->
+    <section id="mid" data-screen-label="Mid" data-comment-anchor="mid" style="padding:34px 0 8px;border-top:1px solid #1c2231;margin-top:30px">
+      <div style="display:flex;align-items:baseline;gap:13px;margin-bottom:4px">
+        <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:30px;letter-spacing:.05em;color:#e8e0cf;margin:0;text-transform:uppercase">Mid</h2>
+        <span style="font-family:'Barlow Semi Condensed',sans-serif;font-size:13px;letter-spacing:.14em;color:#9a7b3d;text-transform:uppercase">18:00 – 28:00</span>
+        <span style="flex:1;height:2px;background:linear-gradient(90deg,#C8A24A,#C8A24A22 60%,transparent)"></span>
+      </div>
+      <p style="color:#cabd9f;font-size:16px;font-style:italic;margin:6px 0 14px;max-width:900px">Farm exploded to 1,272/min, but the team lost the first mid-boss and you got bursted in the enemy jungle.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #6FA84B;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Souls/min</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#6FA84B">1,272</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Souls</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">+12,715</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">K/D/A</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">0/1/2</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Hero dmg</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">3,200</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8413B;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Dmg taken</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">4,895</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #D9A441;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Accuracy</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">36.6%</div></div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Economy</div>
+        <div style="padding:8px 16px 14px"><div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#6FA84B;background:#6FA84B1f;border:1px solid #6FA84B55">Did well</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">1,272 souls/min is strong farming. Your economy recovered well here; the issue was converting it into a build that mattered.</span></div></div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Combat</div>
+        <div style="padding:8px 16px 14px"><div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#D9A441;background:#D9A4411f;border:1px solid #D9A44155">Hard to say</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">3,200 damage and two assists. Better participation, but still light for the souls you had.</span></div></div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Survivability</div>
+        <div style="padding:8px 16px 14px"><div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#C8413B;background:#C8413B1f;border:1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">The 26:10 death took only 9.6 seconds and happened deep on the enemy side. Caught alone and bursted with no armour.</span></div></div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Itemisation</div>
+        <div style="padding:8px 16px 14px">
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#6FA84B;background:#6FA84B1f;border:1px solid #6FA84B55">Did well</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">Berserker and Blood Tribute are real Warden damage items.</span></div>
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#C8413B;background:#C8413B1f;border:1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">Blood Tribute on a build with no armour and no real health pool turned its self-damage into a liability rather than an aggression tool.</span></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <div style="display:flex;align-items:center;gap:9px;background:linear-gradient(90deg,#16140f,#11151e);border:1px solid #2a3144;border-left:3px solid #C56B2C;padding:7px 11px"><div style="width:30px;height:30px;flex:0 0 auto;background:linear-gradient(160deg,#a8642a,#5e3414);border:1px solid #C56B2C;display:grid;place-items:center"><div style="width:15px;height:5px;background:#f0c79a;transform:rotate(-22deg)"></div></div><div><div style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:13px;color:#e8e0cf;line-height:1.05">Berserker</div><div style="font-size:10.5px;color:#C56B2C;letter-spacing:.09em;text-transform:uppercase">Weapon · bought</div></div></div>
+            <div style="display:flex;align-items:center;gap:9px;background:linear-gradient(90deg,#16140f,#11151e);border:1px solid #2a3144;border-left:3px solid #B07BD6;padding:7px 11px"><div style="width:30px;height:30px;flex:0 0 auto;background:linear-gradient(160deg,#5a3a6a,#371a44);border:1px solid #B07BD6;display:grid;place-items:center"><div style="width:13px;height:13px;border:2px solid #e0c0f5;border-radius:50%"></div></div><div><div style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:13px;color:#e8e0cf;line-height:1.05">Blood Tribute</div><div style="font-size:10.5px;color:#B07BD6;letter-spacing:.09em;text-transform:uppercase">Spirit · −24,575 self</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Targeting</div>
+        <div style="padding:8px 16px 14px"><div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#C8413B;background:#C8413B1f;border:1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">Most of your damage went into Abrams, a frontline tank, while Venator and Lady Geist farmed and scaled freely.</span></div></div>
+      </div>
+    </section>
+
+    <!-- =============== LATE =============== -->
+    <section id="late" data-screen-label="Late" data-comment-anchor="late" style="padding:34px 0 8px;border-top:1px solid #1c2231;margin-top:30px">
+      <div style="display:flex;align-items:baseline;gap:13px;margin-bottom:4px">
+        <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:30px;letter-spacing:.05em;color:#e8e0cf;margin:0;text-transform:uppercase">Late</h2>
+        <span style="font-family:'Barlow Semi Condensed',sans-serif;font-size:13px;letter-spacing:.14em;color:#9a7b3d;text-transform:uppercase">28:00 – 38:22</span>
+        <span style="flex:1;height:2px;background:linear-gradient(90deg,#C8A24A,#C8A24A22 60%,transparent)"></span>
+      </div>
+      <p style="color:#cabd9f;font-size:16px;font-style:italic;margin:6px 0 14px;max-width:900px">Highest damage output of the game, but four deaths at 70–82 seconds each ended any chance of a comeback.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #6FA84B;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Souls/min</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#6FA84B">1,400</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Souls</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">+14,510</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8A24A;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">K/D/A</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">3/4/3</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #6FA84B;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Hero dmg</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#6FA84B">15,505</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #C8413B;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Dmg taken</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#C8413B">21,327</div></div>
+        <div style="background:#11151d;border:1px solid #2a3144;border-top:2px solid #D9A441;padding:8px 13px;min-width:92px"><div style="font-size:11.5px;letter-spacing:.1em;color:#978d77;text-transform:uppercase;font-weight:700">Accuracy</div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#e8e0cf">34.1%</div></div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Economy</div>
+        <div style="padding:8px 16px 14px">
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#6FA84B;background:#6FA84B1f;border:1px solid #6FA84B55">Did well</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">1,400 souls/min, the best of the game. You never stopped farming.</span></div>
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#D9A441;background:#D9A4411f;border:1px solid #D9A44155">Hard to say</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">Farming hard while 40k+ behind can be correct (you need items to fight) or a sign of farming instead of grouping. Depends on what the team was doing.</span></div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Combat</div>
+        <div style="padding:8px 16px 14px">
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#6FA84B;background:#6FA84B1f;border:1px solid #6FA84B55">Did well</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">15,505 hero damage and three kills. When you actually committed with items online, you contributed.</span></div>
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#C8413B;background:#C8413B1f;border:1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">You still took 21,327 damage, more than you dealt, because nothing was mitigating it.</span></div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Survivability</div>
+        <div style="padding:8px 16px 14px"><div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#C8413B;background:#C8413B1f;border:1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">Four deaths, each costing 70–82 seconds dead. Late respawn timers are brutal — each death was over a minute of your team fighting four-versus-five. This is where the game was sealed.</span></div></div>
+      </div>
+
+      <div style="border:1px solid #232a3a;background:#11151d;margin:9px 0">
+        <div style="padding:11px 16px;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16.5px;letter-spacing:.07em;text-transform:uppercase;color:#C8A24A;background:linear-gradient(180deg,#1b2130,#141925);border-bottom:1px solid #232a3a"><span style="color:#7d6128;margin-right:8px">◆</span>Itemisation</div>
+        <div style="padding:8px 16px 14px">
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#6FA84B;background:#6FA84B1f;border:1px solid #6FA84B55">Did well</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">Crippling Headshot and Weighted Shots are strong late weapon items.</span></div>
+          <div style="display:flex;gap:10px;margin:8px 0"><span style="flex:0 0 auto;align-self:flex-start;font:700 11px 'Barlow Semi Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;color:#C8413B;background:#C8413B1f;border:1px solid #C8413B55">Cost you</span><span style="color:#cfc7b4;font-size:15px;line-height:1.6">Still no Bullet or Spirit Armour at 38 minutes — every fight you absorbed roughly 1.4× the damage you dealt.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============== TARGETING =============== -->
+    <section id="targeting" data-screen-label="Targeting" data-comment-anchor="targeting" style="padding:34px 0 8px;border-top:1px solid #1c2231;margin-top:30px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;letter-spacing:.06em;color:#e8e0cf;margin:0;text-transform:uppercase">Targeting &amp; threats</h2>
+        <span style="flex:1;height:2px;background:linear-gradient(90deg,#C8A24A,#C8A24A22 60%,transparent)"></span>
+        <span style="color:#7d6128">◆</span>
+      </div>
+
+      <div style="background:linear-gradient(180deg,#141925,#0e121b);border:1px solid #6c552a55;box-shadow:inset 0 0 0 1px #2a2f3d;padding:20px 22px">
+        <div style="color:#d4cdba;font-size:16px;line-height:1.75;max-width:980px">Your damage went into the wrong places. The two enemies who beat you most — <b style="color:#C8413B">Lady Geist</b> (dealt you 25,605) and <b style="color:#C8413B">Venator</b> (21,084) — received far less of your attention than <b style="color:#e8e0cf">Abrams</b> (18,016 from you), a tank who was never the threat. Warden's kit (Alchemical Flask to drain stamina, then Binding Word to root) is built to lock down a single high-value squishy. Use it on the enemy carry, then focus everything there, rather than chipping the frontline.</div>
+
+        <!-- damage matrix -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px">
+          <div>
+            <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;color:#6FA84B;text-transform:uppercase;margin-bottom:8px">You dealt damage to</div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Abrams</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:100%;background:linear-gradient(90deg,#6FA84B,#3c5a2a)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">18,016</span></div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Venator</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:92%;background:linear-gradient(90deg,#6FA84B,#3c5a2a)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">16,639</span></div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Lady Geist</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:68%;background:linear-gradient(90deg,#6FA84B,#3c5a2a)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">12,212</span></div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Mirage</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:55%;background:linear-gradient(90deg,#6FA84B,#3c5a2a)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">9,838</span></div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Graves</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:42%;background:linear-gradient(90deg,#6FA84B,#3c5a2a)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">7,611</span></div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Paige</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:14%;background:linear-gradient(90deg,#6FA84B,#3c5a2a)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">2,598</span></div>
+          </div>
+          <div>
+            <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;color:#C8413B;text-transform:uppercase;margin-bottom:8px">You took damage from</div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Lady Geist</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:100%;background:linear-gradient(90deg,#C8413B,#5e1814)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">25,605</span></div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Venator</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:82%;background:linear-gradient(90deg,#C8413B,#5e1814)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">21,084</span></div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Abrams</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:74%;background:linear-gradient(90deg,#C8413B,#5e1814)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">18,981</span></div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Mirage</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:64%;background:linear-gradient(90deg,#C8413B,#5e1814)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">16,456</span></div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Paige</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:58%;background:linear-gradient(90deg,#C8413B,#5e1814)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">14,871</span></div>
+            <div style="display:flex;align-items:center;gap:9px;margin:6px 0"><span style="width:84px;color:#cabd9f;font-size:13.5px">Graves</span><span style="flex:1;height:14px;background:#1b2130;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:42%;background:linear-gradient(90deg,#C8413B,#5e1814)"></span></span><span style="width:54px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf;font-size:14.5px">10,686</span></div>
+          </div>
+        </div>
+        <div style="margin-top:16px;display:inline-flex;align-items:center;gap:10px;background:#16140f;border:1px solid #3a2c16;border-left:3px solid #D9A441;padding:9px 14px"><span style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:11px;letter-spacing:.12em;color:#D9A441;text-transform:uppercase">Self-damage · Blood Tribute</span><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:20px;color:#D9A441">24,575</span></div>
+      </div>
+
+      <!-- focus enemies -->
+      <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:15px;letter-spacing:.08em;color:#C8A24A;text-transform:uppercase;margin:22px 0 10px">The enemies who beat you</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div style="background:#11151d;border:1px solid #232a3a;border-top:2px solid #C8413B;padding:13px 15px"><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:18px;color:#e8e0cf;letter-spacing:.03em">Venator</div><div style="font-size:11px;color:#C8413B;letter-spacing:.08em;text-transform:uppercase;margin:2px 0 7px">Killed you 3×</div><div style="color:#b3aa93;font-size:14px;line-height:1.55">Long-range carry, enemy's 2nd-highest net worth. <b style="color:#B07BD6">Knockdown</b> is a cheap hard counter (knocks him out of the air); don't face-check his sightlines without armour.</div></div>
+        <div style="background:#11151d;border:1px solid #232a3a;border-top:2px solid #C8413B;padding:13px 15px"><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:18px;color:#e8e0cf;letter-spacing:.03em">Lady Geist</div><div style="font-size:11px;color:#C8413B;letter-spacing:.08em;text-transform:uppercase;margin:2px 0 7px">Killed you 3×</div><div style="color:#b3aa93;font-size:14px;line-height:1.55">Dealt you the most damage in the game (25,605), largely spirit burst. <b style="color:#6FA84B">Improved Spirit Armour</b> and respecting her burst windows were the missing answers.</div></div>
+        <div style="background:#11151d;border:1px solid #232a3a;border-top:2px solid #C8413B;padding:13px 15px"><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:18px;color:#e8e0cf;letter-spacing:.03em">Mirage</div><div style="font-size:11px;color:#C8413B;letter-spacing:.08em;text-transform:uppercase;margin:2px 0 7px">Killed you 2×</div><div style="color:#b3aa93;font-size:14px;line-height:1.55">Top net worth on the enemy team; killed you twice early and snowballed off it. Stabilising the first 18 minutes is what keeps him in check.</div></div>
+      </div>
+
+      <!-- recommended buys -->
+      <div style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:15px;letter-spacing:.08em;color:#C8A24A;text-transform:uppercase;margin:22px 0 10px">The remedies you skipped</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:11px;background:linear-gradient(90deg,#0f1410,#11151e);border:1px solid #2a3144;border-left:3px solid #6FA84B;padding:9px 13px"><div style="width:38px;height:38px;flex:0 0 auto;background:linear-gradient(160deg,#3c5a2a,#24371a);border:1px solid #6FA84B;display:grid;place-items:center"><div style="width:16px;height:16px;border:2px solid #b6e09a;border-radius:3px;transform:rotate(45deg)"></div></div><div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:600;font-size:15px;color:#e8e0cf">Improved Bullet Armour</div><div style="font-size:11.5px;color:#6FA84B;letter-spacing:.09em;text-transform:uppercase">Vitality · 3,000</div></div></div>
+        <div style="display:flex;align-items:center;gap:11px;background:linear-gradient(90deg,#0f1410,#11151e);border:1px solid #2a3144;border-left:3px solid #6FA84B;padding:9px 13px"><div style="width:38px;height:38px;flex:0 0 auto;background:linear-gradient(160deg,#3c5a2a,#24371a);border:1px solid #6FA84B;display:grid;place-items:center"><div style="width:14px;height:14px;border:2px solid #b6e09a;transform:rotate(45deg)"></div></div><div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:600;font-size:15px;color:#e8e0cf">Improved Spirit Armour</div><div style="font-size:11.5px;color:#6FA84B;letter-spacing:.09em;text-transform:uppercase">Vitality · 3,200</div></div></div>
+        <div style="display:flex;align-items:center;gap:11px;background:linear-gradient(90deg,#16140f,#11151e);border:1px solid #2a3144;border-left:3px solid #B07BD6;padding:9px 13px"><div style="width:38px;height:38px;flex:0 0 auto;background:linear-gradient(160deg,#5a3a6a,#371a44);border:1px solid #B07BD6;display:grid;place-items:center"><div style="width:15px;height:15px;border:2px solid #e0c0f5;border-radius:50%"></div></div><div><div style="font-family:'Big Shoulders Display',sans-serif;font-weight:600;font-size:15px;color:#e8e0cf">Knockdown</div><div style="font-size:11.5px;color:#B07BD6;letter-spacing:.09em;text-transform:uppercase">Spirit · vs Venator</div></div></div>
+      </div>
+      <div style="margin-top:9px;font-size:12px;color:#847c6a;font-style:italic">Item icons + costs are placeholder slots in this mock — they resolve to live Deadlock art and current shop prices from assets.deadlock-api.com when generated by the skill.</div>
+    </section>
+
+    <!-- =============== SCOREBOARD =============== -->
+    <section id="scoreboard" data-screen-label="Scoreboard" data-comment-anchor="scoreboard" style="padding:34px 0 8px;border-top:1px solid #1c2231;margin-top:30px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <h2 style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;letter-spacing:.06em;color:#e8e0cf;margin:0;text-transform:uppercase">Scoreboard</h2>
+        <span style="flex:1;height:2px;background:linear-gradient(90deg,#C8A24A,#C8A24A22 60%,transparent)"></span>
+        <span style="color:#7d6128">◆</span>
+      </div>
+      <div style="background:linear-gradient(180deg,#141925,#0e121b);border:1px solid #232a3a;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:14px">
+          <thead>
+            <tr style="background:#0d111a">
+              <th style="text-align:left;padding:10px 14px;color:#978d77;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase">Hero</th>
+              <th style="text-align:left;padding:10px 8px;color:#978d77;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase">K/D/A</th>
+              <th style="text-align:right;padding:10px 8px;color:#978d77;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase">Net worth</th>
+              <th style="text-align:right;padding:10px 8px;color:#978d77;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase">Souls/min</th>
+              <th style="text-align:right;padding:10px 8px;color:#978d77;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase">LH/DN</th>
+              <th style="text-align:left;padding:10px 12px;color:#978d77;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase">Items (W/S/V)</th>
+              <th style="text-align:right;padding:10px 14px;color:#978d77;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase">Lvl</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="7" style="padding:8px 14px;background:#160f0d;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:13px;letter-spacing:.12em;color:#C8413B;text-transform:uppercase;border-top:1px solid #232a3a;border-bottom:1px solid #232a3a">Team 0 — Lost</td></tr>
+            <tr style="border-bottom:1px solid #1c2231"><td style="padding:9px 14px;color:#cdc6b3">Vyper</td><td style="padding:9px 8px;color:#bcae92">3/10/4</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf">39,889</td><td style="padding:9px 8px;text-align:right;color:#bcae92">1,040</td><td style="padding:9px 8px;text-align:right;color:#a89f8a">224/4</td><td style="padding:9px 12px"><span style="color:#C56B2C">W4</span> <span style="color:#B07BD6">S3</span> <span style="color:#6FA84B">V4</span></td><td style="padding:9px 14px;text-align:right;color:#bcae92">35</td></tr>
+            <tr style="border-bottom:1px solid #1c2231"><td style="padding:9px 14px;color:#cdc6b3">Yamato</td><td style="padding:9px 8px;color:#bcae92">2/8/6</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf">39,460</td><td style="padding:9px 8px;text-align:right;color:#bcae92">1,028</td><td style="padding:9px 8px;text-align:right;color:#a89f8a">220/4</td><td style="padding:9px 12px"><span style="color:#C56B2C">W1</span> <span style="color:#B07BD6">S7</span> <span style="color:#6FA84B">V1</span></td><td style="padding:9px 14px;text-align:right;color:#bcae92">35</td></tr>
+            <tr style="border-bottom:1px solid #1c2231"><td style="padding:9px 14px;color:#cdc6b3">Vindicta</td><td style="padding:9px 8px;color:#bcae92">7/7/4</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf">38,836</td><td style="padding:9px 8px;text-align:right;color:#bcae92">1,012</td><td style="padding:9px 8px;text-align:right;color:#a89f8a">122/0</td><td style="padding:9px 12px"><span style="color:#C56B2C">W5</span> <span style="color:#B07BD6">S3</span> <span style="color:#6FA84B">V3</span></td><td style="padding:9px 14px;text-align:right;color:#bcae92">34</td></tr>
+            <tr style="border-bottom:1px solid #1c2231;background:rgba(200,162,74,.09);box-shadow:inset 3px 0 0 #C8A24A"><td style="padding:9px 14px;color:#F4D888;font-weight:700">Warden <span style="font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;color:#C8A24A;border:1px solid #C8A24A66;padding:1px 6px;margin-left:4px;text-transform:uppercase">You</span></td><td style="padding:9px 8px;color:#e8e0cf;font-weight:700">2/9/5</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#F4D888;font-weight:700">36,668</td><td style="padding:9px 8px;text-align:right;color:#e8e0cf">956</td><td style="padding:9px 8px;text-align:right;color:#bcae92">162/5</td><td style="padding:9px 12px"><span style="color:#C56B2C;font-weight:700">W7</span> <span style="color:#B07BD6">S3</span> <span style="color:#6FA84B">V1</span></td><td style="padding:9px 14px;text-align:right;color:#e8e0cf">33</td></tr>
+            <tr style="border-bottom:1px solid #1c2231"><td style="padding:9px 14px;color:#cdc6b3">Rem</td><td style="padding:9px 8px;color:#bcae92">1/8/10</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf">32,165</td><td style="padding:9px 8px;text-align:right;color:#bcae92">838</td><td style="padding:9px 8px;text-align:right;color:#a89f8a">160/0</td><td style="padding:9px 12px"><span style="color:#C56B2C">W1</span> <span style="color:#B07BD6">S4</span> <span style="color:#6FA84B">V4</span></td><td style="padding:9px 14px;text-align:right;color:#bcae92">30</td></tr>
+            <tr style="border-bottom:1px solid #1c2231"><td style="padding:9px 14px;color:#cdc6b3">Billy</td><td style="padding:9px 8px;color:#bcae92">5/9/6</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf">31,488</td><td style="padding:9px 8px;text-align:right;color:#bcae92">821</td><td style="padding:9px 8px;text-align:right;color:#a89f8a">164/1</td><td style="padding:9px 12px"><span style="color:#C56B2C">W4</span> <span style="color:#B07BD6">S3</span> <span style="color:#6FA84B">V4</span></td><td style="padding:9px 14px;text-align:right;color:#bcae92">29</td></tr>
+            <tr><td colspan="7" style="padding:8px 14px;background:#0c1612;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:13px;letter-spacing:.12em;color:#6FA84B;text-transform:uppercase;border-top:1px solid #232a3a;border-bottom:1px solid #232a3a">Team 1 — Won</td></tr>
+            <tr style="border-bottom:1px solid #1c2231"><td style="padding:9px 14px;color:#cdc6b3">Mirage <span style="font-family:'Barlow Semi Condensed',sans-serif;font-size:11px;letter-spacing:.05em;color:#C8413B;border:1px solid #C8413B66;padding:1px 5px;text-transform:uppercase">killed you 2×</span></td><td style="padding:9px 8px;color:#bcae92">13/2/16</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf">53,667</td><td style="padding:9px 8px;text-align:right;color:#bcae92">1,399</td><td style="padding:9px 8px;text-align:right;color:#a89f8a">205/8</td><td style="padding:9px 12px"><span style="color:#C56B2C">W6</span> <span style="color:#B07BD6">S3</span> <span style="color:#6FA84B">V3</span></td><td style="padding:9px 14px;text-align:right;color:#bcae92">36</td></tr>
+            <tr style="border-bottom:1px solid #1c2231"><td style="padding:9px 14px;color:#cdc6b3">Paige</td><td style="padding:9px 8px;color:#bcae92">3/3/25</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf">52,628</td><td style="padding:9px 8px;text-align:right;color:#bcae92">1,372</td><td style="padding:9px 8px;text-align:right;color:#a89f8a">244/2</td><td style="padding:9px 12px"><span style="color:#C56B2C">W0</span> <span style="color:#B07BD6">S8</span> <span style="color:#6FA84B">V3</span></td><td style="padding:9px 14px;text-align:right;color:#bcae92">36</td></tr>
+            <tr style="border-bottom:1px solid #1c2231"><td style="padding:9px 14px;color:#cdc6b3">Venator <span style="font-family:'Barlow Semi Condensed',sans-serif;font-size:11px;letter-spacing:.05em;color:#C8413B;border:1px solid #C8413B66;padding:1px 5px;text-transform:uppercase">killed you 3×</span></td><td style="padding:9px 8px;color:#bcae92">12/4/14</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf">47,587</td><td style="padding:9px 8px;text-align:right;color:#bcae92">1,240</td><td style="padding:9px 8px;text-align:right;color:#a89f8a">233/6</td><td style="padding:9px 12px"><span style="color:#C56B2C">W6</span> <span style="color:#B07BD6">S1</span> <span style="color:#6FA84B">V5</span></td><td style="padding:9px 14px;text-align:right;color:#bcae92">36</td></tr>
+            <tr style="border-bottom:1px solid #1c2231"><td style="padding:9px 14px;color:#cdc6b3">Lady Geist <span style="font-family:'Barlow Semi Condensed',sans-serif;font-size:11px;letter-spacing:.05em;color:#C8413B;border:1px solid #C8413B66;padding:1px 5px;text-transform:uppercase">killed you 3×</span></td><td style="padding:9px 8px;color:#bcae92">6/1/26</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf">46,504</td><td style="padding:9px 8px;text-align:right;color:#bcae92">1,212</td><td style="padding:9px 8px;text-align:right;color:#a89f8a">179/5</td><td style="padding:9px 12px"><span style="color:#C56B2C">W0</span> <span style="color:#B07BD6">S8</span> <span style="color:#6FA84B">V2</span></td><td style="padding:9px 14px;text-align:right;color:#bcae92">36</td></tr>
+            <tr style="border-bottom:1px solid #1c2231"><td style="padding:9px 14px;color:#cdc6b3">Graves</td><td style="padding:9px 8px;color:#bcae92">8/4/16</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf">44,502</td><td style="padding:9px 8px;text-align:right;color:#bcae92">1,160</td><td style="padding:9px 8px;text-align:right;color:#a89f8a">165/5</td><td style="padding:9px 12px"><span style="color:#C56B2C">W4</span> <span style="color:#B07BD6">S5</span> <span style="color:#6FA84B">V3</span></td><td style="padding:9px 14px;text-align:right;color:#bcae92">36</td></tr>
+            <tr><td style="padding:9px 14px;color:#cdc6b3">Abrams <span style="font-family:'Barlow Semi Condensed',sans-serif;font-size:11px;letter-spacing:.05em;color:#C8413B;border:1px solid #C8413B66;padding:1px 5px;text-transform:uppercase">killed you 1×</span></td><td style="padding:9px 8px;color:#bcae92">8/6/16</td><td style="padding:9px 8px;text-align:right;font-family:'Big Shoulders Display',sans-serif;color:#e8e0cf">40,453</td><td style="padding:9px 8px;text-align:right;color:#bcae92">1,054</td><td style="padding:9px 8px;text-align:right;color:#a89f8a">131/1</td><td style="padding:9px 12px"><span style="color:#C56B2C">W4</span> <span style="color:#B07BD6">S6</span> <span style="color:#6FA84B">V2</span></td><td style="padding:9px 14px;text-align:right;color:#bcae92">35</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div style="margin-top:30px;padding-top:18px;border-top:1px solid #1c2231;color:#7a7160;font-size:13px;letter-spacing:.04em;text-align:center">Generated by <b style="color:#978d77">deadlock-match-report</b> · data via deadlock-api.com · portraits &amp; item icons via assets.deadlock-api.com</div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  componentDidMount() { this._tries = 0; this.tryCharts(); }
+
+  tryCharts() {
+    if (window.Plotly && document.getElementById('soulLead')) { this.drawCharts(); return; }
+    if (this._tries++ < 120) setTimeout(() => this.tryCharts(), 100);
+  }
+
+  drawCharts() {
+    const P = window.Plotly;
+    const x = [3,6,9,12,15,20,25,30,35,38.3667];
+    const cfg = { displayModeBar:false, responsive:true };
+    const font = { family:"'Barlow', system-ui, sans-serif", color:'#a89f8a', size:13 };
+    const axis = (extra) => Object.assign({
+      gridcolor:'#1e2636', zerolinecolor:'#3a4250', linecolor:'#2a3242',
+      tickfont:{ color:'#978d77', size:12.5 }, automargin:true
+    }, extra || {});
+    const layout = (extra) => Object.assign({
+      paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(255,255,255,0.012)',
+      font, margin:{ l:56, r:18, t:10, b:40 },
+      legend:{ orientation:'h', y:-0.18, font:{ color:'#a89f8a', size:12.5 } },
+      hoverlabel:{ bgcolor:'#11151d', bordercolor:'#C8A24A', font:{ color:'#e8e0cf' } }
+    }, extra || {});
+
+    // 1 — Soul lead
+    const deaths = [8.8167,10.8167,13.3667,17.3167,26.1667,29.8833,31.65,36.5833,37.8167];
+    const shapes = [{ type:'line', xref:'paper', x0:0, x1:1, y0:0, y1:0, line:{ color:'#5a6172', dash:'dot', width:1 } }]
+      .concat(deaths.map(d => ({ type:'line', xref:'x', x0:d, x1:d, yref:'paper', y0:0, y1:1, line:{ color:'#C8413B', dash:'dot', width:1 } })));
+    P.newPlot('soulLead', [{
+      x, y:[173,-739,-3580,-7836,-5906,-8114,-13673,-26935,-44500,-66799],
+      fill:'tozeroy', mode:'lines', line:{ color:'#2ADFFC', width:3 },
+      fillcolor:'rgba(42,223,252,0.10)', name:'Soul lead',
+      hovertemplate:'%{x:.0f} min · %{y:,} souls<extra></extra>'
+    }], layout({ shapes, showlegend:false,
+      xaxis:axis({ title:{ text:'minute', font:{ color:'#978d77', size:12.5 } }, dtick:5 }),
+      yaxis:axis({ tickformat:',d' }) }), cfg);
+
+    // 2 — Net worth
+    const others = [
+      ['Yamato',[1955,3556,4737,6676,10484,15475,21593,25324,31779,39431],'#5f7a86'],
+      ['Venator',[1874,3398,5317,8538,10497,17656,23067,32468,39539,47574],'#8a6f55'],
+      ['Mirage',[1726,3624,6574,11051,16836,22344,29886,34800,41932,53654],'#7a6b9a'],
+      ['Billy',[1809,3077,5481,7333,11222,16230,22635,26541,28609,31488],'#6b7280'],
+      ['Rem',[1917,3650,5287,9013,12240,17286,20994,25040,28848,32164],'#5f8a6f'],
+      ['Abrams',[1899,4266,6176,9666,11351,15527,20379,27379,33874,40440],'#9a7d8a']
+    ];
+    const traces = others.map(([n,y,c]) => ({ x, y, mode:'lines', name:n,
+      line:{ color:c, width:1.4 }, hovertemplate:n+' · %{y:,}<extra></extra>' }));
+    traces.push({ x, y:[1705,3268,4880,7067,9443,15680,22158,26410,30925,36668],
+      mode:'lines', name:'Warden (you)', line:{ color:'#C8A24A', width:4 },
+      hovertemplate:'Warden · %{y:,}<extra></extra>' });
+    P.newPlot('netWorth', traces, layout({
+      xaxis:axis({ dtick:5 }), yaxis:axis({ tickformat:'~s' }) }), cfg);
+
+    // 3 — Damage dealt vs taken
+    P.newPlot('dmgChart', [
+      { x, y:[739,1467,2381,3118,3578,6563,6778,14764,17728,22283], mode:'lines',
+        name:'Dealt', line:{ color:'#6FA84B', width:3 }, hovertemplate:'Dealt · %{y:,}<extra></extra>' },
+      { x, y:[929,2417,5318,7436,9152,12223,14047,25173,28777,35374], mode:'lines',
+        name:'Taken', line:{ color:'#C8413B', width:3 }, hovertemplate:'Taken · %{y:,}<extra></extra>' }
+    ], layout({ xaxis:axis({ dtick:5 }), yaxis:axis({ tickformat:'~s' }) }), cfg);
+
+    // 4 — Death cost
+    const dl = ['Mirage 8:49','Mirage 10:49','Abrams 13:22','Venator 17:19','Venator 26:10','Lady Geist 29:53','Lady Geist 31:39','Venator 36:35','Lady Geist 37:49'];
+    const dy = [14,17,21,27,56,70,72,80,82];
+    P.newPlot('deathCost', [{
+      x:dl, y:dy, type:'bar',
+      marker:{ color:dy, colorscale:[[0,'#D9A441'],[1,'#C8413B']], cmin:0, cmax:90,
+        line:{ color:'#0a0d13', width:1 } },
+      text:dy.map(v => v+'s'), textposition:'outside',
+      textfont:{ color:'#bcae92', size:12.5, family:"'Barlow', sans-serif" },
+      hovertemplate:'%{x} · %{y}s dead<extra></extra>'
+    }], layout({ margin:{ l:46, r:14, t:18, b:96 }, showlegend:false,
+      xaxis:axis({ tickangle:-40, tickfont:{ color:'#978d77', size:11.5 } }),
+      yaxis:axis({ title:{ text:'seconds dead', font:{ color:'#978d77', size:12.5 } }, range:[0,96] }) }), cfg);
+
+    window.addEventListener('resize', () => {
+      ['soulLead','netWorth','dmgChart','deathCost'].forEach(id => {
+        const el = document.getElementById(id); if (el) P.Plots.resize(el);
+      });
+    });
+  }
+}
+</script>
+</body>
+</html>

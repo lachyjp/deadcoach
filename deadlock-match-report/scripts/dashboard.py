@@ -20,6 +20,7 @@ loaded once via CDN.
 """
 import argparse, html, json, re, sys
 from pathlib import Path
+from urllib.parse import urlsplit
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import charts as C
 
@@ -172,6 +173,22 @@ table.sb th.r{text-align:right}
 .bar .nm{display:inline-flex;align-items:center;gap:7px;width:108px}
 .baravatar{width:18px;height:18px;border-radius:50%;object-fit:cover;object-position:center top;border:1px solid #2a3144;flex:0 0 auto}
 .ecard .h{display:flex;align-items:center}
+/* hero playbook: situational tips, macro, resources */
+.sitgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.sitcard{background:#11151d;border:1px solid #232a3a;border-top:2px solid #C8A24A;padding:13px 15px}
+.sit-h{font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:15px;letter-spacing:.04em;color:#C8A24A;text-transform:uppercase;margin-bottom:6px}
+.sit-b{color:#cfc7b4;font-size:14.5px;line-height:1.6}
+.tips{list-style:none;padding:0;margin:10px 0 0}
+.tips li{position:relative;padding:11px 14px 11px 30px;background:#11151d;border:1px solid #232a3a;border-left:3px solid #6FA84B;margin:8px 0;color:#d4cdba;font-size:15px;line-height:1.6}
+.tips li::before{content:"◆";position:absolute;left:11px;top:12px;color:#6FA84B;font-size:11px}
+.reslist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+a.res{display:grid;grid-template-columns:auto 1fr auto;gap:2px 14px;align-items:center;background:linear-gradient(90deg,#16140f,#11151e);border:1px solid #2a3144;border-left:3px solid #2ADFFC;padding:11px 15px}
+a.res:hover{border-color:#2ADFFC;background:linear-gradient(90deg,#1a1812,#141a26)}
+.res .rk{grid-column:1;grid-row:1/3;align-self:center;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.05em;color:#2ADFFC;text-transform:uppercase;min-width:62px}
+.res .rt{grid-column:2;grid-row:1;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16px;color:#e8e0cf;letter-spacing:.02em}
+.res .rwhy{grid-column:2;grid-row:2;color:#a89f8a;font-size:13px;line-height:1.45}
+.res .rhost{grid-column:3;grid-row:1/3;align-self:center;color:#7a7160;font-size:12px;white-space:nowrap}
+@media(max-width:760px){.sitgrid{grid-template-columns:1fr}.res .rhost{display:none}}
 /* builds + deadlock UI item cards */
 .buildrow{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;margin-top:10px}
 .buildrow dl-item-card{display:block}
@@ -676,9 +693,57 @@ def builds_section(digest):
     </section>'''
 
 
+# ---- hero playbook (situational tips, macro, learn-more resources) ----------
+def resource_link(r, digest):
+    url = r.get("url", "")
+    try:
+        host = urlsplit(url).netloc.replace("www.", "")
+    except Exception:
+        host = ""
+    kind = (r.get("kind") or "link").lower()
+    badge = {"video": "▶ Video", "article": "❖ Article"}.get(kind, "↗ Link")
+    return (f'<a class="res" href="{esc(url)}" target="_blank" rel="noopener noreferrer">'
+            f'<span class="rk">{badge}</span>'
+            f'<span class="rt">{esc(r.get("title", ""))}</span>'
+            f'<span class="rwhy">{rich(r.get("why", ""), digest)}</span>'
+            f'<span class="rhost">{esc(host)}</span></a>')
+
+
+def playbook_section(digest, analysis):
+    a = analysis or {}
+    hg = a.get("hero_guide") or {}
+    overview = hg.get("overview", "")
+    situations = hg.get("situations") or []
+    macro = a.get("macro_tips") or []
+    resources = a.get("resources") or []
+    if not (overview or situations or macro or resources):
+        return ""
+    me = next(p for p in digest["players"] if p["is_me"])
+    parts = []
+    if overview:
+        parts.append(f'<div class="bracket">{brackets()}<div class="verdict">{rich(overview, digest)}</div></div>')
+    if situations:
+        cards = "".join(
+            f'<div class="sitcard"><div class="sit-h">{rich(s.get("situation", ""), digest)}</div>'
+            f'<div class="sit-b">{rich(s.get("advice", ""), digest)}</div></div>'
+            for s in situations)
+        parts.append(f'<div class="subhead">Situational play</div><div class="sitgrid">{cards}</div>')
+    if macro:
+        lis = "".join(f'<li>{rich(m, digest)}</li>' for m in macro)
+        parts.append(f'<div class="subhead">Macro: turning fights into objectives</div><ul class="tips">{lis}</ul>')
+    if resources:
+        rows = "".join(resource_link(r, digest) for r in resources)
+        parts.append(f'<div class="subhead">Go deeper</div><div class="reslist">{rows}</div>'
+                     '<div class="note">External guides — open in a new tab.</div>')
+    return f'''<section id="playbook" class="divided">
+      {sec_head(me["hero"] + " playbook")}
+      {"".join(parts)}
+    </section>'''
+
+
 # ---- assembly ---------------------------------------------------------------
 def nav_links():
-    items = ["Overview", "Charts"] + PHASES + ["Builds", "Targeting", "Scoreboard"]
+    items = ["Overview", "Charts"] + PHASES + ["Builds", "Targeting", "Playbook", "Scoreboard"]
     return "".join(f'<a href="#{s.lower().replace(" ", "-")}">{esc(s)}</a>' for s in items)
 
 
@@ -723,6 +788,7 @@ def build(digest, analysis):
 {phases}
 {builds_section(digest)}
 {targeting_section(digest, me, analysis, item_index)}
+{playbook_section(digest, analysis)}
 {scoreboard(digest)}
 <div class="footer">Generated by <b>deadlock-match-report</b> · data via deadlock-api.com · portraits, item icons &amp; cards via assets.deadlock-api.com</div>
 </main>

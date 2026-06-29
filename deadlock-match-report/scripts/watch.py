@@ -47,15 +47,23 @@ def load_seen(out_root, acc):
 def save_seen(out_root, acc, seen):
     seen_path(out_root, acc).write_text(json.dumps(sorted(seen)))
 
-def new_matches(acc, seen, ranked_only):
+BRAWL_GAME_MODE = 4  # Street Brawl (short ~5-15 min mode with inflated souls); 1 = standard Deadlock
+
+def new_matches(acc, seen, ranked_only, include_brawl=False):
     hist = L.match_history(acc)
     ids = []
+    skipped_brawl = 0
     for h in hist:
         if h["match_id"] in seen:
+            continue
+        if not include_brawl and h.get("game_mode") == BRAWL_GAME_MODE:
+            skipped_brawl += 1
             continue
         if ranked_only and h.get("match_mode") not in (1, 4):  # 1 unranked? 4 ranked - keep both by default
             pass
         ids.append(h["match_id"])
+    if skipped_brawl:
+        print(f"skipping {skipped_brawl} Street Brawl match(es) (use --include-brawl to report them)")
     return sorted(ids)   # oldest first
 
 CLAUDE_PROMPT = (
@@ -107,7 +115,12 @@ def main():
     ap.add_argument("--once", action="store_true")
     ap.add_argument("--no-llm", action="store_true")
     ap.add_argument("--open", action="store_true")
+    ap.add_argument("--serve-seconds", type=int, default=25,
+                    help="with --once --open, keep the local server up this long so the browser can "
+                         "load the item cards, then exit (0 = stay up until Ctrl-C)")
     ap.add_argument("--ranked-only", action="store_true")
+    ap.add_argument("--include-brawl", action="store_true",
+                    help="also build reports for Street Brawl games (skipped by default)")
     ap.add_argument("--backfill", type=int, default=0,
                     help="on first run, process the N most recent matches (default 0: just mark them seen)")
     args = ap.parse_args()
@@ -117,7 +130,7 @@ def main():
     def tick():
         seen = load_seen(args.out_root, args.account)
         nonlocal first_run
-        fresh = new_matches(args.account, seen, args.ranked_only)
+        fresh = new_matches(args.account, seen, args.ranked_only, args.include_brawl)
         if first_run and args.backfill >= 0:
             # don't reprocess full history on first run; optionally backfill the newest N
             to_do = fresh[-args.backfill:] if args.backfill else []
@@ -137,11 +150,15 @@ def main():
         tick()
         if args.open and _httpd is not None:
             port = _httpd.server_address[1]
-            print(f"serving reports at http://127.0.0.1:{port}/ — Ctrl-C to stop.")
-            try:
-                threading.Event().wait()
-            except KeyboardInterrupt:
-                print("\nstopped.")
+            if args.serve_seconds and args.serve_seconds > 0:
+                print(f"serving reports at http://127.0.0.1:{port}/ for {args.serve_seconds}s.")
+                time.sleep(args.serve_seconds)
+            else:
+                print(f"serving reports at http://127.0.0.1:{port}/ — Ctrl-C to stop.")
+                try:
+                    threading.Event().wait()
+                except KeyboardInterrupt:
+                    print("\nstopped.")
     else:
         print(f"watching account {args.account} every {args.interval}s. Ctrl-C to stop.")
         while True:

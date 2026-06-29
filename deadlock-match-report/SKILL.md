@@ -117,6 +117,8 @@ skill for each new match via Claude Code headless:
 - Daemon: `python3 scripts/watch.py --account <ACCOUNT> --out-root <DIR> --interval 180`
 - `--no-llm` builds a data-only dashboard (charts + scoreboard, no written analysis) without an LLM
   call, which is good for testing the watcher cheaply.
+- Street Brawl games (`game_mode=4`, short with inflated souls) are skipped by default since their
+  per-minute/economy metrics aren't meaningful; pass `--include-brawl` to report them too.
 First run marks existing history as seen (use `--backfill N` to also do the newest N). See
 `references/automation.md` for launchd/cron/systemd setup. Tell the user that full reports use tokens
 via Claude Code, so they should build a few manually first to confirm output and cost.
